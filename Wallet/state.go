@@ -6,6 +6,7 @@ package Wallet
 
 import (
 	"github.com/FactomProject/FactomCode/util"
+	"github.com/FactomProject/factoid/state"
 	"github.com/FactomProject/factoid/state/stateinit"
 )
 
@@ -19,4 +20,9 @@ var (
 	databasefile = "factoid_wallet_bolt.db"
 )
 
-var factoidState = stateinit.NewFactoidState(cfg.BoltDBPath + databasefile)
+var factoidState state.IFactoidState
+
+func init() {
+	factoidState = stateinit.NewFactoidState(cfg.BoltDBPath + databasefile)
+	Init()
+}
