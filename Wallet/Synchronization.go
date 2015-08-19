@@ -523,7 +523,7 @@ func (bd ByteData) UnmarshalBinaryData(data []byte) ([]byte, error) {
 }
 
 func (bd ByteData) String() string {
-	return fmt.Sprint("%x", bd)
+	return fmt.Sprint("%x", []byte(bd))
 }
 
 func (bd ByteData) IsEqual(factoid.IBlock) []factoid.IBlock {
