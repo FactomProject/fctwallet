@@ -8,8 +8,10 @@ import (
 	"github.com/FactomProject/FactomCode/common"
 	"github.com/FactomProject/factoid"
 	"github.com/FactomProject/factoid/block"
+	"github.com/FactomProject/factoid/wallet"
 	"github.com/FactomProject/factom"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -70,6 +72,7 @@ type Block struct {
 	IsEntryCreditBlock bool
 	IsEntryBlock       bool
 }
+
 type ListEntry struct {
 	ChainID string
 	KeyMR   string
@@ -182,12 +185,12 @@ func Synchronize() error {
 		}
 
 		log.Printf("\n\nProcessing dblock number %v\n", body.SequenceNumber)
-
-		str, err := EncodeJSONString(body)
-		if err != nil {
-			return err
-		}
-		log.Printf("%v", str)
+		/*
+			str, err := EncodeJSONString(body)
+			if err != nil {
+				return err
+			}
+			log.Printf("%v", str)*/
 
 		for _, v := range body.EntryBlockList {
 			if v.ChainID == "000000000000000000000000000000000000000000000000000000000000000a" {
@@ -197,7 +200,11 @@ func Synchronize() error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("\nfetchedBlock - %v\n\n", fetchedBlock)
+			//fmt.Printf("\nfetchedBlock - %v\n\n", fetchedBlock)
+			err = ExtractOurTransactionsFromBlock(fetchedBlock)
+			if err != nil {
+				return err
+			}
 		}
 
 		if maxHeight < body.SequenceNumber {
@@ -214,6 +221,43 @@ func Synchronize() error {
 	err = SaveDataStatus(dataStatus)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func GetUserStringForAddress(we wallet.IWalletEntry) string {
+	address, err := we.GetAddress()
+	if err != nil {
+		panic(err)
+	}
+	return fmt.Sprintf("%x", address.Bytes())
+}
+
+func ExtractOurTransactionsFromBlock(block *Block) error {
+	addresses := GetAddresses()
+	for _, v := range block.EntryList {
+		for _, a := range addresses {
+			add := GetUserStringForAddress(a)
+			if strings.Contains(v.JSONString, add) {
+				err := SaveOurTransaction(v)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func SaveOurTransaction(tx *Entry) error {
+	switch tx.ChainID {
+	case "000000000000000000000000000000000000000000000000000000000000000c":
+		fmt.Printf("\n\nec transaction - %v\n\n", tx.JSONString)
+		break
+	case "000000000000000000000000000000000000000000000000000000000000000f":
+		break
+	default:
+		break
 	}
 	return nil
 }
@@ -485,25 +529,6 @@ type ByteData []byte
 
 var _ factoid.IBlock = (*ByteData)(nil)
 
-/*
-	encoding.BinaryMarshaler   // Easy to support this, just drop the slice.
-	encoding.BinaryUnmarshaler // And once in Binary, it must come back.
-	//encoding.TextMarshaler     // Using this mostly for debugging
-	CustomMarshalText() ([]byte, error)
-
-	// We need the progress through the slice, so we really can't use the stock spec
-	// for the UnmarshalBinary() method from encode.  We define our own method that
-	// makes the code easier to read and way more efficent.
-	UnmarshalBinaryData(data []byte) ([]byte, error)
-	String() string // Makes debugging, logging, and error reporting easier
-
-	IsEqual(IBlock) []IBlock // Check if this block is the same as itself.
-	//   Returns nil, or the path to the first difference.
-
-	GetDBHash() IHash       // Identifies the class of the object
-	GetHash() IHash         // Returns the hash of the object
-	GetNewInstance() IBlock // Get a new instance of this object*/
-
 func (bd ByteData) MarshalBinary() (data []byte, err error) {
 	return []byte(bd), nil
 }
@@ -544,8 +569,8 @@ func (bd ByteData) GetNewInstance() factoid.IBlock {
 
 func LoadData(bucket, key string, dst interface{}) (interface{}, error) {
 	fmt.Printf("\nLoadData - %v, %v\n\n", bucket, key)
-	v := factoidState.GetDB().GetRaw([]byte(bucket), []byte(key))
-
+	//v := factoidState.GetDB().GetRaw([]byte(bucket), []byte(key))
+	v := DataMap[bucket+key]
 	if v == nil {
 		return nil, nil
 	}
@@ -563,6 +588,7 @@ func LoadData(bucket, key string, dst interface{}) (interface{}, error) {
 }
 
 func SaveData(bucket, key string, toStore interface{}) error {
+	fmt.Printf("\n\nSaveData - %v, %v, %v\n\n", bucket, key, toStore)
 	var data bytes.Buffer
 
 	enc := gob.NewEncoder(&data)
@@ -572,7 +598,10 @@ func SaveData(bucket, key string, toStore interface{}) error {
 		return err
 	}
 
-	factoidState.GetDB().PutRaw([]byte(bucket), []byte(key), ByteData(data.Bytes()))
+	//factoidState.GetDB().PutRaw([]byte(bucket), []byte(key), ByteData(data.Bytes()))
+	DataMap[bucket+key] = ByteData(data.Bytes())
 
 	return nil
 }
+
+var DataMap map[string]factoid.IBlock = map[string]factoid.IBlock{}

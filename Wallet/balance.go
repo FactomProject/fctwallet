@@ -15,7 +15,6 @@ import (
 	"strconv"
 )
 
-
 func FactoidBalance(adr string) (int64, error) {
 	if !fct.ValidateFUserStr(adr) {
 		err := ValidateKey(adr)
