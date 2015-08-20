@@ -20,10 +20,10 @@ type Response struct {
 }
 
 func ValidateKey(key string) error {
-	if len(key) > fct.ADDRESS_LENGTH {
+	if len(key) != 2*fct.ADDRESS_LENGTH {
 		return fmt.Errorf("Key is too long.")
 	}
-	if badChar.FindStringIndex(key) != nil {
+	if badHexChar.FindStringIndex(key) != nil {
 		return fmt.Errorf("Key contains invalid characters.")
 	}
 	return nil

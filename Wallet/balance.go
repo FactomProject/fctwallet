@@ -19,7 +19,7 @@ func FactoidBalance(adr string) (int64, error) {
 	if !fct.ValidateFUserStr(adr) {
 		err := ValidateKey(adr)
 		if err != nil {
-			return 0, err
+			return 0, fmt.Errorf("Invalid Factoid Address")
 		}
 
 		we := factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(adr))
@@ -65,11 +65,10 @@ func FactoidBalance(adr string) (int64, error) {
 }
 
 func ECBalance(adr string) (int64, error) {
-
 	if !fct.ValidateECUserStr(adr) {
 		err := ValidateKey(adr)
 		if err != nil {
-			return 0, err
+			return 0, fmt.Errorf("Invalid EC Address")
 		}
 
 		we := factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(adr))
