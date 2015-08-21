@@ -35,14 +35,11 @@ var DataStatus *DataStatusStruct
 
 const DataStatusBucket string = "DataStatus"
 
-var BucketList []string = []string{DataStatusBucket}
-
 type Common struct {
 	ChainID   string
 	Timestamp string
 
 	JSONString   string
-	SpewString   string
 	BinaryString string
 }
 
@@ -66,11 +63,6 @@ type Block struct {
 	EntryCount int
 
 	EntryList []*Entry
-
-	IsAdminBlock       bool
-	IsFactoidBlock     bool
-	IsEntryCreditBlock bool
-	IsEntryBlock       bool
 }
 
 type ListEntry struct {
@@ -82,24 +74,13 @@ type DBlock struct {
 	DBHash string
 
 	PrevBlockKeyMR string
-	NextBlockKeyMR string
 	TimeStamp      uint64
 	SequenceNumber int
 
-	EntryBlockList   []ListEntry
-	AdminBlock       ListEntry
-	FactoidBlock     ListEntry
-	EntryCreditBlock ListEntry
+	EntryBlockList []ListEntry
 
 	BlockTimeStr string
 	KeyMR        string
-
-	Blocks int
-
-	AdminEntries       int
-	EntryCreditEntries int
-	FactoidEntries     int
-	EntryEntries       int
 }
 
 func (e *DBlock) JSON() (string, error) {
@@ -339,7 +320,6 @@ func ParseEntryCreditBlock(chainID, hash string, rawBlock []byte, blockTime stri
 		if err != nil {
 			return nil, err
 		}
-		entry.SpewString = v.Spew()
 
 		answer.EntryList[i] = entry
 	}
@@ -348,8 +328,6 @@ func ParseEntryCreditBlock(chainID, hash string, rawBlock []byte, blockTime stri
 	if err != nil {
 		return nil, err
 	}
-	answer.SpewString = ecBlock.Spew()
-	answer.IsEntryCreditBlock = true
 
 	return answer, nil
 }
@@ -389,7 +367,6 @@ func ParseFactoidBlock(chainID, hash string, rawBlock []byte, blockTime string) 
 		if err != nil {
 			return nil, err
 		}
-		entry.SpewString = v.Spew()
 
 		answer.EntryList[i] = entry
 	}
@@ -397,8 +374,6 @@ func ParseFactoidBlock(chainID, hash string, rawBlock []byte, blockTime string) 
 	if err != nil {
 		return nil, err
 	}
-	answer.SpewString = fBlock.Spew()
-	answer.IsFactoidBlock = true
 
 	return answer, nil
 }
@@ -445,9 +420,6 @@ func ParseEntryBlock(chainID, hash string, rawBlock []byte, blockTime string) (*
 	if err != nil {
 		return nil, err
 	}
-	answer.SpewString = eBlock.Spew()
-
-	answer.IsEntryBlock = true
 
 	return answer, nil
 }
@@ -472,7 +444,6 @@ func FetchAndParseEntry(hash, blockTime string) (*Entry, error) {
 		return nil, err
 	}
 	e.JSONString = str
-	e.SpewString = entry.Spew()
 	e.BinaryString = fmt.Sprintf("%x", raw)
 	e.Timestamp = blockTime
 
@@ -511,18 +482,13 @@ func GetDBlockFromFactom(keyMR string) (*DBlock, error) {
 }
 
 func Init() {
-	/*for _, v := range BucketList {
-		err := factoidState.GetDB().Update(func(tx *bolt.Tx) error {
-			_, err := tx.CreateBucketIfNotExists([]byte(v))
-			if err != nil {
-				return fmt.Errorf("create bucket: %s", err)
-			}
-			return nil
-		})
-		if err != nil {
-			panic(err)
-		}
-	}*/
+	buckets := [][]byte{[]byte(DataStatusBucket)}
+	bd := new(ByteData)
+	iBlockMap := map[[32]byte]factoid.IBlock{}
+	iBlockMap[bd.GetDBHash().Fixed()] = bd
+
+	factoidState.GetDB().GetPersist().Init(buckets, iBlockMap)
+	factoidState.GetDB().GetBacker().Init(buckets, iBlockMap)
 }
 
 type ByteData []byte
