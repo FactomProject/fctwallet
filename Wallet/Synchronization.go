@@ -174,7 +174,8 @@ func Synchronize() error {
 			log.Printf("%v", str)*/
 
 		for _, v := range body.EntryBlockList {
-			if v.ChainID == "000000000000000000000000000000000000000000000000000000000000000a" {
+			if v.ChainID != "000000000000000000000000000000000000000000000000000000000000000c" &&
+				v.ChainID != "000000000000000000000000000000000000000000000000000000000000000f" {
 				continue
 			}
 			fetchedBlock, err := FetchBlock(v.ChainID, v.KeyMR, body.BlockTimeStr)
@@ -244,6 +245,7 @@ func SaveOurTransaction(tx *Entry) error {
 }
 
 func FetchBlock(chainID, hash, blockTime string) (*Block, error) {
+	fmt.Printf("Fetching block %v, %v\n", chainID, hash)
 	block := new(Block)
 
 	raw, err := factom.GetRaw(hash)
@@ -404,17 +406,19 @@ func ParseEntryBlock(chainID, hash string, rawBlock []byte, blockTime string) (*
 
 	answer.PrevBlockHash = eBlock.Header.PrevKeyMR.String()
 
-	answer.EntryCount = len(eBlock.Body.EBEntries)
-	answer.EntryList = make([]*Entry, answer.EntryCount)
+	answer.EntryCount = 0
+	answer.EntryList = []*Entry{}
 	answer.BinaryString = fmt.Sprintf("%x", rawBlock)
 
-	for i, v := range eBlock.Body.EBEntries {
-		entry, err := FetchAndParseEntry(v.String(), blockTime)
-		if err != nil {
-			return nil, err
+	for _, v := range eBlock.Body.EBEntries {
+		if IsMinuteMarker(v.String()) == false {
+			entry, err := FetchAndParseEntry(v.String(), blockTime)
+			if err != nil {
+				return nil, err
+			}
+			answer.EntryCount++
+			answer.EntryList = append(answer.EntryList, entry)
 		}
-
-		answer.EntryList[i] = entry
 	}
 	answer.JSONString, err = eBlock.JSONString()
 	if err != nil {
@@ -422,6 +426,14 @@ func ParseEntryBlock(chainID, hash string, rawBlock []byte, blockTime string) (*
 	}
 
 	return answer, nil
+}
+
+func IsMinuteMarker(hash string) bool {
+	h, err := common.HexToHash(hash)
+	if err != nil {
+		panic(err)
+	}
+	return h.IsMinuteMarker()
 }
 
 func FetchAndParseEntry(hash, blockTime string) (*Entry, error) {
