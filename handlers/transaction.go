@@ -18,6 +18,7 @@ import (
 	"github.com/hoisie/web"
 
 	"github.com/FactomProject/fctwallet/Wallet"
+	"github.com/FactomProject/fctwallet/Wallet/Utility"
 )
 
 /******************************************
@@ -149,6 +150,45 @@ func getParams_(ctx *web.Context, params string, ec bool) (
  * Handler Functions
  *************************************************************************/
 
+// Returns either an unbounded list of transactions, or the list of 
+// transactions that involve a given address.
+//
+func HandleGetProcessedTransactions(ctx*web.Context, parms string) {
+	cmd := ctx.Params["cmd"]
+	adr := ctx.Params["address"]
+	
+	if cmd == "all" {
+		list, err := Utility.DumpTransactions(nil)
+		if err != nil {
+			reportResults(ctx,err.Error(),false)
+			return
+		}
+		reportResults(ctx,string(list),true)
+	}else{
+		
+		adr, err := Wallet.LookupAddress("FA",adr)
+		if err != nil {
+			adr, err = Wallet.LookupAddress("EC",adr)
+			if err != nil {
+				reportResults(ctx,fmt.Sprintf("Could not understand address %s",adr),false)
+				return
+			}
+		}
+		badr,err := hex.DecodeString(adr)
+		
+		var adrs [][]byte
+		adrs = append(adrs,badr)
+		
+		list, err := Utility.DumpTransactions(adrs)
+		if err != nil {
+			reportResults(ctx,err.Error(),false)
+			return
+		}
+		reportResults(ctx,string(list),true)
+	}
+}
+
+
 // Setup:  seed --
 // Setup creates the 10 fountain Factoid Addresses, then sets address
 // generation to be unique for this wallet.  You CAN call setup multiple
@@ -241,6 +281,34 @@ func HandleFactoidDeleteTransaction(ctx *web.Context, key string) {
 	reportResults(ctx, "Success deleting transaction", true)
 }
 
+func HandleProperties (ctx *web.Context){
+	prop,err := Wallet.GetProperties()
+	if err != nil {
+		reportResults(ctx, "Failed to retrieve properties",false)
+	}
+	
+	top := prop.Protocol_Version/1000000
+	mid := (prop.Protocol_Version%1000000)/1000
+	low := prop.Protocol_Version%1000
+	
+	ret :=      fmt.Sprintf("Protocol Version:   %d.%d.%d\n",top,mid,low)
+	
+	top  = prop.Factomd_Version/1000000
+	mid  = (prop.Factomd_Version%1000000)/1000
+	low  = prop.Factomd_Version%1000
+	
+	ret = ret+ fmt.Sprintf("factomd Version:    %d.%d.%d\n",top,mid,low)
+
+	top  = prop.Fctwallet_Version/1000000
+	mid  = (prop.Fctwallet_Version%1000000)/1000
+	low  = prop.Fctwallet_Version%1000
+	
+	ret = ret+ fmt.Sprintf("fctwallet Version:  %d.%d.%d\n",top,mid,low)
+
+	reportResults(ctx, ret, true)
+	
+}
+
 func HandleFactoidAddFee(ctx *web.Context, parms string) {
 	trans, key, _, address, _, ok := getParams_(ctx, parms, false)
 	if !ok {
@@ -314,7 +382,8 @@ func HandleFactoidAddOutput(ctx *web.Context, parms string) {
 
 	reportResults(ctx, "Success adding output", true)
 }
-
+		
+		
 func HandleFactoidAddECOutput(ctx *web.Context, parms string) {
 	trans, key, _, address, amount, ok := getParams_(ctx, parms, true)
 	if !ok {
