@@ -8,10 +8,12 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"github.com/FactomProject/factoid/block"
-	fct "github.com/FactomProject/factoid"
+	"github.com/FactomProject/factomd/common/factoid/block"
+	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factom"
-	"github.com/FactomProject/FactomCode/common"
+	"github.com/FactomProject/factomd/common/directoryBlock"
+	"github.com/FactomProject/factomd/common/constants"
+	"github.com/FactomProject/factomd/common/primitives"
 	"encoding/json"
 )
 
@@ -20,11 +22,11 @@ import (
  ***********************************************/
 
 // Older blocks smaller indexes.  All the Factoid Directory blocks
-var DirectoryBlocks  = make([]*common.DirectoryBlock,0,100)
-var FactoidBlocks    = make([]block.IFBlock,0,100)
-var DBHead    []byte = common.ZERO_HASH
+var DirectoryBlocks  = make([]*directoryBlock.DirectoryBlock,0,100)
+var FactoidBlocks    = make([]interfaces.IFBlock,0,100)
+var DBHead    []byte = constants.ZERO_HASH
 var DBHeadStr string = ""
-var DBHeadLast []byte = common.ZERO_HASH	
+var DBHeadLast []byte = constants.ZERO_HASH	
 	
 // Refresh the Directory Block Head.  If it has changed, return true.
 // Otherwise return false.
@@ -48,7 +50,7 @@ func getDBHead() bool {
 }
 
 func getAll() error {
-	dbs := make([] *common.DirectoryBlock,0,100)
+	dbs := make([] *directoryBlock.DirectoryBlock,0,100)
 	next := DBHeadStr
 	
 	for {
@@ -56,16 +58,18 @@ func getAll() error {
 		if err != nil {
 			panic(err.Error())
 		}
-		db := new(common.DirectoryBlock)
+		db := new(directoryBlock.DirectoryBlock)
+		fmt.Println(hex.EncodeToString(blk))
 		err = db.UnmarshalBinary(blk)
+		fmt.Println(db)
 		if err != nil {
 			panic(err.Error())
 		}
 		dbs = append(dbs,db)
-		if bytes.Equal(db.Header.PrevKeyMR.Bytes(),DBHeadLast) {
+		if bytes.Equal(db.Header.GetPrevKeyMR().Bytes(),DBHeadLast) {
 			break
 		}
-		next = hex.EncodeToString(db.Header.PrevKeyMR.Bytes())
+		next = hex.EncodeToString(db.Header.GetPrevKeyMR().Bytes())
 	}
 	
 	DBHeadLast = DBHead
@@ -75,9 +79,9 @@ func getAll() error {
 		fb := new(block.FBlock)
 		var fcnt int
 		for _,dbe := range dbs[i].DBEntries {
-			if bytes.Equal(dbe.ChainID.Bytes(),common.FACTOID_CHAINID) {
+			if bytes.Equal(dbe.GetChainID().Bytes(),constants.FACTOID_CHAINID) {
 				fcnt++
-				hashstr := hex.EncodeToString(dbe.KeyMR.Bytes())
+				hashstr := hex.EncodeToString(dbe.GetKeyMR().Bytes())
 				fdata,err := factom.GetRaw(hashstr)
 				if err != nil {
 					panic(err.Error())
@@ -113,7 +117,7 @@ func refresh() error {
 	return nil
 }
 
-func filtertransaction(trans fct.ITransaction, addresses [][]byte) bool {
+func filtertransaction(trans interfaces.ITransaction, addresses [][]byte) bool {
 	if addresses == nil || len(addresses)==0 {
 		return true
 	}
@@ -153,20 +157,20 @@ func DumpTransactionsJSON(addresses [][]byte) ([]byte, error) {
 		return nil, err
 	}
 
-	var transactions []fct.ITransaction
+	var transactions []interfaces.ITransaction
 	
 	for i,fb := range FactoidBlocks {
 		for _, t := range fb.GetTransactions() {
 			t.SetBlockHeight(i)
 			t.GetSigHash()
 			for _,input := range t.GetInputs() {
-				input.SetUserAddress(fct.ConvertFctAddressToUserStr(input.GetAddress()))
+				input.SetUserAddress(primitives.ConvertFctAddressToUserStr(input.GetAddress()))
 			}
 			for _,output := range t.GetOutputs() {
-				output.SetUserAddress(fct.ConvertFctAddressToUserStr(output.GetAddress()))
+				output.SetUserAddress(primitives.ConvertFctAddressToUserStr(output.GetAddress()))
 			}
 			for _,ecoutput := range t.GetECOutputs() {
-				ecoutput.SetUserAddress(fct.ConvertECAddressToUserStr(ecoutput.GetAddress()))
+				ecoutput.SetUserAddress(primitives.ConvertECAddressToUserStr(ecoutput.GetAddress()))
 			}
 			prtTrans := filtertransaction(t,addresses)
 			if prtTrans {
@@ -288,6 +292,6 @@ func DumpTransactions(addresses [][]byte) ([]byte, error) {
 }
 
 // At some point we will need to be smarter... Process Blocks and transactions here!
-func ProcessFB(fb block.IFBlock) error {
+func ProcessFB(fb interfaces.IFBlock) error {
 	return nil
 }
