@@ -59,9 +59,7 @@ func getAll() error {
 			panic(err.Error())
 		}
 		db := new(directoryBlock.DirectoryBlock)
-		fmt.Println(hex.EncodeToString(blk))
 		err = db.UnmarshalBinary(blk)
-		fmt.Println(db)
 		if err != nil {
 			panic(err.Error())
 		}
