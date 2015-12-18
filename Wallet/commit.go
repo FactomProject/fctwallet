@@ -15,6 +15,7 @@ import (
 	fct "github.com/FactomProject/factoid"
 	"github.com/FactomProject/factoid/wallet"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
+	netki "github.com/netkicorp/go-partner-client"
 )
 
 func CommitChain(name string, data []byte) error {
@@ -34,23 +35,26 @@ func CommitChain(name string, data []byte) error {
 	}
 
 	var we fct.IBlock
-	
-	if Utility.IsValidAddress(name) && strings.HasPrefix(name,"EC") {
+
+	if Utility.IsValidAddress(name) && strings.HasPrefix(name, "EC") {
 		addr := fct.ConvertUserStrToAddress(name)
-		we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY),addr)
+		we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
 	} else if Utility.IsValidHexAddress(name) {
 		addr, err := hex.DecodeString(name)
 		if err == nil {
 			we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
 		}
-	}else{
+	} else if adr, err := netki.WalletNameLookup(name, "fec"); err != nil {
+		addr := fct.ConvertUserStrToAddress(adr)
+		we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
+	} else {
 		we = factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(name))
 	}
-	
+
 	if we == nil {
 		return fmt.Errorf("Unknown address")
 	}
-	
+
 	signed := make([]byte, 0)
 	switch we.(type) {
 	case wallet.IWalletEntry:
@@ -94,7 +98,23 @@ func CommitEntry(name string, data []byte) error {
 		return fmt.Errorf("Could not decode message:", err)
 	}
 
-	we := factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(name))
+	var we fct.IBlock
+
+	if Utility.IsValidAddress(name) && strings.HasPrefix(name, "EC") {
+		addr := fct.ConvertUserStrToAddress(name)
+		we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
+	} else if Utility.IsValidHexAddress(name) {
+		addr, err := hex.DecodeString(name)
+		if err == nil {
+			we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
+		}
+	} else if adr, err := netki.WalletNameLookup(name, "fec"); err != nil {
+		addr := fct.ConvertUserStrToAddress(adr)
+		we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
+	} else {
+		we = factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(name))
+	}
+
 	signed := make([]byte, 0)
 	switch we.(type) {
 	case wallet.IWalletEntry:
