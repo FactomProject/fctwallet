@@ -115,6 +115,16 @@ func refresh() error {
 	return nil
 }
 
+func GetDBHeight() (uint32, error) {
+	if err := refresh(); err != nil {
+		return 0, err
+	}
+	
+	h := DirectoryBlocks[len(DirectoryBlocks)-1].GetHeader().GetDBHeight()
+	return h, nil
+}
+
+
 func filtertransaction(trans interfaces.ITransaction, addresses [][]byte) bool {
 	if addresses == nil || len(addresses)==0 {
 		return true
