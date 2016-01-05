@@ -15,6 +15,7 @@ import (
 
 func ComposeChainSubmit(name string, data []byte) ([]byte, error) {
 	type chainsubmit struct {
+		ChainID string
 		ChainCommit json.RawMessage
 		EntryReveal json.RawMessage
 	}
@@ -34,6 +35,8 @@ func ComposeChainSubmit(name string, data []byte) ([]byte, error) {
 		pri := new([fct.PRIVATE_LENGTH]byte)
 		copy(pri[:], we.(wallet.IWalletEntry).GetPrivKey(0))
 
+		sub.ChainID = c.ChainID
+		
 		if j, err := factom.ComposeChainCommit(pub, pri, c); err != nil {
 			return nil, err
 		} else {
