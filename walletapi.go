@@ -49,6 +49,12 @@ func Start() {
 
 	server.Get("/v1/factoid-generate-address-from-token-sale/(.*)", handlers.HandleFactoidGenerateAddressFromMnemonic)
 
+	// Compose
+	// localhost:8089/v1/compose-entry-submit/<name or address
+	// Returns a json object to be used for the commit and reveal api calls
+	// to factomd.
+	server.Post("/v1/compose-entry-submit/([^/]+)", handlers.HandleComposeEntrySubmit)
+
 	// New Transaction
 	// localhost:8089/v1/factoid-new-transaction/<key>
 	// Use the key in subsequent calls to add inputs, outputs, ecoutputs, and to

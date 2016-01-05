@@ -5,6 +5,7 @@
 package handlers
 
 import (
+	"fmt"
 	"io/ioutil"
 	
 	"github.com/FactomProject/fctwallet/Wallet"
@@ -20,7 +21,7 @@ func HandleComposeEntrySubmit(ctx *web.Context, name string) {
 		return
 	}
 
-	j, err = Wallet.ComposeEntrySubmit(name, data)
+	j, err := Wallet.ComposeEntrySubmit(name, data)
 	if err != nil {
 		fmt.Println(err)
 		ctx.WriteHeader(httpBad)
@@ -28,7 +29,7 @@ func HandleComposeEntrySubmit(ctx *web.Context, name string) {
 		return
 	}
 
-	ctx.WriteHeader(httpGood)
+	ctx.WriteHeader(200)
 	ctx.Write(j)
 	return
 }
