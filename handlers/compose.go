@@ -5,14 +5,13 @@
 package handlers
 
 import (
-	"fmt"
 	"io/ioutil"
-
+	
 	"github.com/FactomProject/fctwallet/Wallet"
 	"github.com/hoisie/web"
 )
 
-func HandleCommitChain(ctx *web.Context, name string) {
+func HandleComposeEntrySubmit(ctx *web.Context, name string) {
 	data, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
 		fmt.Println("Could not read from http request:", err)
@@ -21,29 +20,15 @@ func HandleCommitChain(ctx *web.Context, name string) {
 		return
 	}
 
-	err = Wallet.CommitChain(name, data)
+	j, err = Wallet.ComposeEntrySubmit(name, data)
 	if err != nil {
 		fmt.Println(err)
 		ctx.WriteHeader(httpBad)
 		ctx.Write([]byte(err.Error()))
 		return
 	}
-}
 
-func HandleCommitEntry(ctx *web.Context, name string) {
-	data, err := ioutil.ReadAll(ctx.Request.Body)
-	if err != nil {
-		fmt.Println("Could not read from http request:", err)
-		ctx.WriteHeader(httpBad)
-		ctx.Write([]byte(err.Error()))
-		return
-	}
-
-	err = Wallet.CommitEntry(name, data)
-	if err != nil {
-		fmt.Println(err)
-		ctx.WriteHeader(httpBad)
-		ctx.Write([]byte(err.Error()))
-		return
-	}
+	ctx.WriteHeader(httpGood)
+	ctx.Write(j)
+	return
 }
