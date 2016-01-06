@@ -574,12 +574,25 @@ func GetAddresses() []byte {
 	return out.Bytes()
 }
 
+// Specifying a fee overrides either not being connected, or the current fee.
+// Params:
+//   key (limit printout to this key)
+//   fee (specify the transation fee)
 func GetTransactions(ctx *web.Context) ([]byte, error) {
-	exch, err := GetFee(ctx)
+	connected := true 
+	key := ctx.Params["key"]
+	
+	var _ = connected
+	
+	exch, err := GetFee(ctx) // The Fee will be zero if we have no connection.
 	if err != nil {
-		return nil, err
+		connected = false
 	}
-
+	fee,err := fct.ConvertFixedPoint(ctx.Params["fee"])
+	if err != nil {
+		exch = fee 
+	}
+	
 	keys, transactions, err := Wallet.GetTransactions()
 	if err != nil {
 		return nil, err
@@ -587,6 +600,11 @@ func GetTransactions(ctx *web.Context) ([]byte, error) {
 
 	var out bytes.Buffer
 	for i, trans := range transactions {
+		if len(key) > 0 {
+			if string(keys[i]) != key {
+				continue
+			}
+		}
 		fee, _ := trans.CalculateFee(uint64(exch))
 		cprt := ""
 		cin, err := trans.TotalInputs()
@@ -618,7 +636,7 @@ func GetTransactions(ctx *web.Context) ([]byte, error) {
 		}
 
 		out.WriteString(fmt.Sprintf("\n%25s:  Fee Due: %s  %s\n\n%s\n",
-			keys[i],
+			strings.TrimRight(string(keys[i]),"\u0000"),
 			strings.TrimSpace(fct.ConvertDecimal(fee)),
 			cprt,
 			transactions[i].String()))
@@ -660,7 +678,25 @@ func HandleGetAddresses(ctx *web.Context) {
 	ctx.Write(j)
 }
 
-func HandleGetTransactions(ctx *web.Context) {
+func HandleGetTransactionsj(ctx *web.Context,key string) {
+	b := new(Response)
+	txt, err := GetTransactions(ctx)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+		return
+	}
+	b.Response = string(txt)
+	b.Success = true
+	j, err := json.Marshal(b)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+		return
+	}
+	ctx.Write(j)
+}
+
+
+func HandleGetTransactions(ctx *web.Context,key string) {
 	b := new(Response)
 	txt, err := GetTransactions(ctx)
 	if err != nil {
