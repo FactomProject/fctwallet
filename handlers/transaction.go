@@ -667,8 +667,20 @@ func GetTransactionsj(ctx *web.Context) (string, error) {
 	
 	var _ = connected
 		
-	_, transactions, _ := Wallet.GetTransactions()
-	return common.EncodeJSONString(transactions)
+	keys, transactions, _ := Wallet.GetTransactions()
+	type pair struct {
+		Key string
+		TransID string
+	}
+	var trans []*pair
+	for i,t := range transactions {
+		p := new(pair)
+		p.Key = strings.TrimRight(string(keys[i]),"\u0000")
+		p.TransID = t.GetSigHash().String()
+		trans = append(trans,p)
+	}
+	
+	return common.EncodeJSONString(trans)
 	
 }
 
