@@ -139,11 +139,11 @@ func Start() {
 
 	// Get transactions
 	// localhost:8089/v1/factoid-get-addresses/
-	server.Get("/v1/factoid-get-transactions/(.*)", handlers.HandleGetTransactions)
+	server.Get("/v1/factoid-get-transactions/", handlers.HandleGetTransactions)
 	
 	// Get transactions
 	// localhost:8089/v1/factoid-get-addresses/
-	server.Get("/v1/factoid-get-transactionsj/(.*)", handlers.HandleGetTransactionsj)
+	server.Get("/v1/factoid-get-transactionsj/", handlers.HandleGetTransactionsj)
 	
 	// Get processed transactions
 	// localhost:8089/v1/factoid-get-addresses/
