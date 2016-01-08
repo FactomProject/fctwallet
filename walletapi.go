@@ -110,7 +110,9 @@ func Start() {
 	// localhost:8089/v1/factoid-setup/<key>
 	// hashes the given data to create a new seed from which to generate addresses.
 	// The point is to create unique and secure addresses for this user.
-	server.Post("/v1/factoid-setup/(.*)", handlers.HandleFactoidSetup)
+
+	// removed the API to create a new seed in a wallet.
+	// server.Post("/v1/factoid-setup/(.*)", handlers.HandleFactoidSetup)
 
 	// Commit Chain
 	// localhost:8089/v1/commit-chain/

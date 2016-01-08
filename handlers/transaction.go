@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-	"time"
+	//"time"
 	"strings"
 
 	fct "github.com/FactomProject/factoid"
@@ -254,6 +254,7 @@ func HandleGetProcessedTransactionsj(ctx*web.Context, parms string) {
 // Setup must be called once before you do anything else with the wallet.
 //
 
+/*
 func HandleFactoidSetup(ctx *web.Context, seed string) {
 	// Make sure we have a seed.
 	if len(seed) == 0 {
@@ -288,6 +289,7 @@ func HandleFactoidSetup(ctx *web.Context, seed string) {
 		reportResults(ctx, "New seed set, no fountain addresses defined", true)
 	}
 }
+*/
 
 // New Transaction:  key --
 // We create a new transaction, and track it with the user supplied key.  The
