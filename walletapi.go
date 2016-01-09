@@ -167,6 +167,11 @@ func Start() {
 }
 
 func main() {
+	
+	fmt.Println("+================+")
+	fmt.Println("|  fctwallet v1  |")
+	fmt.Println("+================+")
+	
 	Start()
 	for {
 		time.Sleep(time.Second)
