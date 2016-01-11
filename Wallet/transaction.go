@@ -271,7 +271,7 @@ func FactoidSubmit(jsonkey string) (string, error) {
 	}
 
 	resp, err := http.Post(
-		fmt.Sprintf("http://%s/v1/factoid-submit/", ipaddressFD+portNumberFD),
+		fmt.Sprintf("http://%s:%d/v1/factoid-submit/", ipaddressFD, portNumberFD),
 		"application/json",
 		bytes.NewBuffer(j))
 
@@ -342,7 +342,7 @@ func isReasonableFee(trans fct.ITransaction) (error) {
 }
 
 func GetFee() (int64, error) {
-	str := fmt.Sprintf("http://%s/v1/factoid-get-fee/", ipaddressFD+portNumberFD)
+	str := fmt.Sprintf("http://%s:%d/v1/factoid-get-fee/", ipaddressFD, portNumberFD)
 	resp, err := http.Get(str)
 	if err != nil {
 		return 0, err
@@ -364,7 +364,7 @@ func GetFee() (int64, error) {
 }
 
 func GetProperties() (*common.Properties, error) {
-	str := fmt.Sprintf("http://%s/v1/properties/", ipaddressFD+portNumberFD)
+	str := fmt.Sprintf("http://%s:%d/v1/properties/", ipaddressFD, portNumberFD)
 	resp, err := http.Get(str)
 	if err != nil {
 		return nil, err

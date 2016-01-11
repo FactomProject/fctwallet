@@ -67,7 +67,7 @@ func CommitChain(name string, data []byte) error {
 	}
 
 	resp, err := http.Post(
-		fmt.Sprintf("http://%s/v1/commit-chain", ipaddressFD+portNumberFD),
+		fmt.Sprintf("http://%s:%d/v1/commit-chain", ipaddressFD, portNumberFD),
 		"application/json",
 		bytes.NewBuffer(j))
 	if err != nil {
@@ -111,7 +111,7 @@ func CommitEntry(name string, data []byte) error {
 	}
 
 	resp, err := http.Post(
-		fmt.Sprintf("http://%s/v1/commit-entry/", ipaddressFD+portNumberFD),
+		fmt.Sprintf("http://%s:%d/v1/commit-entry/", ipaddressFD, portNumberFD),
 		"application/json",
 		bytes.NewBuffer(j))
 	if err != nil {
