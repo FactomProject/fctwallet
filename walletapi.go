@@ -49,6 +49,13 @@ func Start() {
 
 	server.Get("/v1/factoid-generate-address-from-token-sale/(.*)", handlers.HandleFactoidGenerateAddressFromMnemonic)
 
+
+	// verify-address-type
+	// localhost:8089/v1/verify-address-type/address=<address>
+	// take address and define its type or fail if not valid address
+	// returns Success true r false in json with type if true
+	server.Get("/v1/verify-address-type/(.*)", handlers.HandleVerifyAddressType)
+
 	// Compose Chain
 	// localhost:8089/v1/compose-chain-submit/<name or address
 	// Returns a json object to be used for the commit and reveal api calls
