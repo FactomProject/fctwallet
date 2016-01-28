@@ -9,7 +9,6 @@ import (
 	"github.com/FactomProject/fctwallet/Wallet"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
 	"github.com/hoisie/web"
-	"fmt"
 )
 
 var _ = fct.Address{}
@@ -162,9 +161,9 @@ func HandleFactoidGenerateAddressFromMnemonic(ctx *web.Context, params string) {
 /*********************************************************************************************************/
 /*********************************************************************************************************/
 func HandleVerifyAddressType(ctx *web.Context, params string) {
-fmt.Println("address:")
+
 	address := ctx.Params["address"]
-	fmt.Println(address)
+
   	resp,pass := Wallet.VerifyAddressType(address)
 
 
