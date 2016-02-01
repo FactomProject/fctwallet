@@ -201,7 +201,7 @@ func VerifyAddressType(address string)(string, bool) {
 		}
 	} else if (strings.HasPrefix(address,"Es")) {
 		if (factoid.ValidateECPrivateUserStr(address)) {
-			resp = "Entry Credit - Public"
+			resp = "Entry Credit - Private"
 			pass = true
 		}
 	} 
@@ -216,6 +216,6 @@ func VerifyAddressType(address string)(string, bool) {
 	//} 
 
 
-	return resp,pass
+	return resp, pass
 }
 
