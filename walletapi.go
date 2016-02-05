@@ -49,7 +49,6 @@ func Start() {
 
 	server.Get("/v1/factoid-generate-address-from-token-sale/(.*)", handlers.HandleFactoidGenerateAddressFromMnemonic)
 
-
 	// verify-address-type
 	// localhost:8089/v1/verify-address-type/address=<address>
 	// take address and define its type or fail if not valid address
@@ -153,7 +152,7 @@ func Start() {
 	// localhost:8089/v1/factoid-get-fee/
 	// Get the Transaction fee
 	server.Get("/v1/properties/", handlers.HandleProperties)
-	
+
 	// Get Address List
 	// localhost:8089/v1/factoid-get-addresses/
 	server.Get("/v1/factoid-get-addresses/", handlers.HandleGetAddresses)
@@ -161,11 +160,11 @@ func Start() {
 	// Get transactions
 	// localhost:8089/v1/factoid-get-addresses/
 	server.Get("/v1/factoid-get-transactions/", handlers.HandleGetTransactions)
-	
+
 	// Get transactions
 	// localhost:8089/v1/factoid-get-addresses/
 	server.Get("/v1/factoid-get-transactionsj/", handlers.HandleGetTransactionsj)
-	
+
 	// Get processed transactions
 	// localhost:8089/v1/factoid-get-addresses/
 	server.Post("/v1/factoid-get-processed-transactions/(.*)", handlers.HandleGetProcessedTransactions)
@@ -173,16 +172,16 @@ func Start() {
 	// Get processed transactions
 	// localhost:8089/v1/factoid-get-addresses/
 	server.Post("/v1/factoid-get-processed-transactionsj/(.*)", handlers.HandleGetProcessedTransactionsj)
-	
+
 	go server.Run(fmt.Sprintf("%s:%d", handlers.IpAddress, handlers.PortNumber))
 }
 
 func main() {
-	
+
 	fmt.Println("+================+")
 	fmt.Println("|  fctwallet v1  |")
 	fmt.Println("+================+")
-	
+
 	Start()
 	for {
 		time.Sleep(time.Second)
