@@ -21,4 +21,4 @@ var (
 
 var factoidState = stateinit.NewFactoidState(cfg.BoltDBPath + databasefile)
 
-const Version = "0.1.4"
+const Version = "0.1.5"
