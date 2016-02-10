@@ -37,9 +37,9 @@ func getDBHead() bool {
 		panic(err.Error())
 	}
 	
-	if db.KeyMR != DBHeadStr {
-		DBHeadStr = db.KeyMR
-		DBHead,err = hex.DecodeString(db.KeyMR)
+	if db != DBHeadStr {
+		DBHeadStr = db
+		DBHead,err = hex.DecodeString(db)
 		if err != nil {
 			panic(err.Error())
 		}
