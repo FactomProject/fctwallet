@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/FactomProject/factoid"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
+	"strings"
 )
 
 /*********************************************************************************************************/
@@ -172,5 +173,49 @@ func GenerateECAddressStringFromHumanReadablePrivateKey(name string, privateKey 
 		return "", err
 	}
 	return factoid.ConvertECAddressToUserStr(addr), nil
+}
+
+
+/*********************************************************************************************************/
+/*********************************************check address type******************************************/
+/*********************************************************************************************************/
+/*********************************************************************************************************/
+func VerifyAddressType(address string)(string, bool) {
+  	var resp string = "Not a Valid Factoid Address"
+	var pass bool = false
+  
+  	if (strings.HasPrefix(address,"FA")) {
+		if (factoid.ValidateFUserStr(address)) {
+			resp = "Factoid - Public"
+			pass = true
+		}
+	} else if (strings.HasPrefix(address,"EC")) {
+		if (factoid.ValidateECUserStr(address)) {
+			resp = "Entry Credit - Public"
+			pass = true
+		}
+	} else if (strings.HasPrefix(address,"Fs")) {
+		if (factoid.ValidateFPrivateUserStr(address)) {
+			resp = "Factoid - Private"
+			pass = true
+		}
+	} else if (strings.HasPrefix(address,"Es")) {
+		if (factoid.ValidateECPrivateUserStr(address)) {
+			resp = "Entry Credit - Private"
+			pass = true
+		}
+	} 
+
+
+
+	//  Add Netki resolution here
+	//else if (checkNetki) {
+	//	if (factoid.ValidateECPrivateUserStr(address)) {
+	//		resp = "{\"AddressType\":\"Factoid - Public\", \"TypeCode\":4 ,\"Success\":true}"
+	//	}
+	//} 
+
+
+	return resp, pass
 }
 
