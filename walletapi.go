@@ -49,6 +49,24 @@ func Start() {
 
 	server.Get("/v1/factoid-generate-address-from-token-sale/(.*)", handlers.HandleFactoidGenerateAddressFromMnemonic)
 
+	// verify-address-type
+	// localhost:8089/v1/verify-address-type/address=<address>
+	// take address and define its type or fail if not valid address
+	// returns Success true r false in json with type if true
+	server.Get("/v1/verify-address-type/(.*)", handlers.HandleVerifyAddressType)
+
+	// Compose Chain
+	// localhost:8089/v1/compose-chain-submit/<name or address
+	// Returns a json object to be used for the commit and reveal api calls
+	// to factomd.
+	server.Post("/v1/compose-chain-submit/([^/]+)", handlers.HandleComposeChainSubmit)
+
+	// Compose Entry
+	// localhost:8089/v1/compose-entry-submit/<name or address
+	// Returns a json object to be used for the commit and reveal api calls
+	// to factomd.
+	server.Post("/v1/compose-entry-submit/([^/]+)", handlers.HandleComposeEntrySubmit)
+
 	// New Transaction
 	// localhost:8089/v1/factoid-new-transaction/<key>
 	// Use the key in subsequent calls to add inputs, outputs, ecoutputs, and to
@@ -98,7 +116,9 @@ func Start() {
 	// localhost:8089/v1/factoid-setup/<key>
 	// hashes the given data to create a new seed from which to generate addresses.
 	// The point is to create unique and secure addresses for this user.
-	server.Post("/v1/factoid-setup/(.*)", handlers.HandleFactoidSetup)
+
+	// removed the API to create a new seed in a wallet.
+	// server.Post("/v1/factoid-setup/(.*)", handlers.HandleFactoidSetup)
 
 	// Commit Chain
 	// localhost:8089/v1/commit-chain/
@@ -132,7 +152,7 @@ func Start() {
 	// localhost:8089/v1/factoid-get-fee/
 	// Get the Transaction fee
 	server.Get("/v1/properties/", handlers.HandleProperties)
-	
+
 	// Get Address List
 	// localhost:8089/v1/factoid-get-addresses/
 	server.Get("/v1/factoid-get-addresses/", handlers.HandleGetAddresses)
@@ -141,6 +161,10 @@ func Start() {
 	// localhost:8089/v1/factoid-get-addresses/
 	server.Get("/v1/factoid-get-transactions/", handlers.HandleGetTransactions)
 
+	// Get transactions
+	// localhost:8089/v1/factoid-get-addresses/
+	server.Get("/v1/factoid-get-transactionsj/", handlers.HandleGetTransactionsj)
+
 	// Get processed transactions
 	// localhost:8089/v1/factoid-get-addresses/
 	server.Post("/v1/factoid-get-processed-transactions/(.*)", handlers.HandleGetProcessedTransactions)
@@ -148,11 +172,16 @@ func Start() {
 	// Get processed transactions
 	// localhost:8089/v1/factoid-get-addresses/
 	server.Post("/v1/factoid-get-processed-transactionsj/(.*)", handlers.HandleGetProcessedTransactionsj)
-	
+
 	go server.Run(fmt.Sprintf("%s:%d", handlers.IpAddress, handlers.PortNumber))
 }
 
 func main() {
+
+	fmt.Println("+================+")
+	fmt.Println("|  fctwallet v1  |")
+	fmt.Println("+================+")
+
 	Start()
 	for {
 		time.Sleep(time.Second)

@@ -12,7 +12,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	
-	"github.com/FactomProject/FactomCode/common"
 	fct "github.com/FactomProject/factoid"
 	"github.com/FactomProject/factoid/wallet"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
@@ -271,7 +270,7 @@ func FactoidSubmit(jsonkey string) (string, error) {
 	}
 
 	resp, err := http.Post(
-		fmt.Sprintf("http://%s/v1/factoid-submit/", ipaddressFD+portNumberFD),
+		fmt.Sprintf("http://%s:%d/v1/factoid-submit/", ipaddressFD, portNumberFD),
 		"application/json",
 		bytes.NewBuffer(j))
 
@@ -342,7 +341,7 @@ func isReasonableFee(trans fct.ITransaction) (error) {
 }
 
 func GetFee() (int64, error) {
-	str := fmt.Sprintf("http://%s/v1/factoid-get-fee/", ipaddressFD+portNumberFD)
+	str := fmt.Sprintf("http://%s:%d/v1/factoid-get-fee/", ipaddressFD, portNumberFD)
 	resp, err := http.Get(str)
 	if err != nil {
 		return 0, err
@@ -363,25 +362,31 @@ func GetFee() (int64, error) {
 	return b.Fee, nil
 }
 
-func GetProperties() (*common.Properties, error) {
-	str := fmt.Sprintf("http://%s/v1/properties/", ipaddressFD+portNumberFD)
+func GetProperties() (protocol, factomd, fctwallet string, err error) {
+	type prop struct {
+		Protocol_Version  string
+		Factomd_Version	  string
+		Fctwallet_Version string
+	}
+	
+	str := fmt.Sprintf("http://%s:%d/v1/properties/", ipaddressFD, portNumberFD)
 	resp, err := http.Get(str)
 	if err != nil {
-		return nil, err
+		return "", "", "", err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		resp.Body.Close()
-		return nil, err
+		return "", "", "", err
 	}
 	resp.Body.Close()
 	
-	b := new(common.Properties)
+	b := new(prop)
 	if err := json.Unmarshal(body, b); err != nil {
-		return nil, err
+		return "", "", "", err
 	}
 	b.Fctwallet_Version = Version
-	return b, nil
+	return b.Protocol_Version, b.Factomd_Version, Version, nil
 }
 
 func GetAddresses() []wallet.IWalletEntry {

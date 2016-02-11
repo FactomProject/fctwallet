@@ -21,9 +21,8 @@ var (
 	applicationName  = "Factom/fctwallet"
 	dataStorePath    = cfg.DataFile
 	refreshInSeconds = cfg.RefreshInSeconds
-
-	ipaddressFD  = "localhost:"
-	portNumberFD = "8088"
+	ipaddressFD      = cfg.FactomdAddress
+	portNumberFD     = cfg.FactomdPort
 
 	//databasefile = "factoid_wallet_bolt.db"
 )

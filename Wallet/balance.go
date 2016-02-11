@@ -75,7 +75,7 @@ func FactoidBalance(adr string) (int64, error) {
 		return 0, err
 	}
 
-	str := fmt.Sprintf("http://%s/v1/factoid-balance/%s", ipaddressFD+portNumberFD, adr)
+	str := fmt.Sprintf("http://%s:%d/v1/factoid-balance/%s", ipaddressFD, portNumberFD, adr)
 	resp, err := http.Get(str)
 	if err != nil {
 		return 0, err
@@ -111,7 +111,7 @@ func ECBalance(adr string) (int64, error) {
 		return 0, err
 	}
 	
-	str := fmt.Sprintf("http://%s/v1/entry-credit-balance/%s", ipaddressFD+portNumberFD, adr)
+	str := fmt.Sprintf("http://%s:%d/v1/entry-credit-balance/%s", ipaddressFD, portNumberFD, adr)
 	resp, err := http.Get(str)
 	if err != nil {
 		return 0, err

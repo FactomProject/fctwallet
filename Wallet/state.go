@@ -13,12 +13,12 @@ var (
 	cfg             = util.ReadConfig().Wallet
 	applicationName = "Factom/fctwallet"
 
-	ipaddressFD  = "localhost:"
-	portNumberFD = "8088"
+	ipaddressFD  = cfg.FactomdAddress
+	portNumberFD = cfg.FactomdPort
 
 	databasefile = "factoid_wallet_bolt.db"
 )
 
 var factoidState = stateinit.NewFactoidState(cfg.BoltDBPath + databasefile)
 
-const Version = 1004
+const Version = "0.1.5"
