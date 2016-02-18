@@ -5,12 +5,12 @@
 package Wallet
 
 import (
-	"github.com/FactomProject/FactomCode/util"
-	"github.com/FactomProject/factoid/state/stateinit"
+	"github.com/FactomProject/factomd/util"
+	"github.com/FactomProject/fctwallet/scwallet"
 )
 
 var (
-	cfg             = util.ReadConfig().Wallet
+	cfg             = util.ReadConfig("").Wallet
 	applicationName = "Factom/fctwallet"
 
 	ipaddressFD  = cfg.FactomdAddress
@@ -19,6 +19,6 @@ var (
 	databasefile = "factoid_wallet_bolt.db"
 )
 
-var factoidState = stateinit.NewFactoidState(cfg.BoltDBPath + databasefile)
+var wallet = scwallet.NewSCWallet(cfg.BoltDBPath, databasefile)
 
 const Version = "0.1.5"

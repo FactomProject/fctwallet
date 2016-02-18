@@ -10,15 +10,18 @@ import (
 	"fmt"
 	"github.com/hoisie/web"
 
-	"github.com/FactomProject/FactomCode/common"
-	"github.com/FactomProject/factoid/block"
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/fctwallet/Wallet"
+
+	"github.com/FactomProject/factomd/common/constants"
+	"github.com/FactomProject/factomd/common/directoryBlock"
+	"github.com/FactomProject/factomd/common/factoid/block"
+	"github.com/FactomProject/factomd/common/interfaces"
 )
 
 // Older blocks smaller indexes.  All the Factoid Directory blocks
-var DirectoryBlocks = make([]*common.DirectoryBlock, 0, 100)
-var FactoidBlocks = make([]block.IFBlock, 0, 100)
+var DirectoryBlocks = make([]*directoryBlock.DirectoryBlock, 0, 100)
+var FactoidBlocks = make([]interfaces.IFBlock, 0, 100)
 var DBHead []byte
 var DBHeadStr string = ""
 
@@ -44,7 +47,7 @@ func getDBHead() bool {
 }
 
 func getAll() error {
-	dbs := make([]*common.DirectoryBlock, 0, 100)
+	dbs := make([]*directoryBlock.DirectoryBlock, 0, 100)
 	next := DBHeadStr
 
 	for {
@@ -52,24 +55,24 @@ func getAll() error {
 		if err != nil {
 			panic(err.Error())
 		}
-		db := new(common.DirectoryBlock)
+		db := new(directoryBlock.DirectoryBlock)
 		err = db.UnmarshalBinary(blk)
 		if err != nil {
 			panic(err.Error())
 		}
 		dbs = append(dbs, db)
-		if bytes.Equal(db.Header.PrevKeyMR.Bytes(), common.ZERO_HASH[:]) {
+		if bytes.Equal(db.GetHeader().GetPrevKeyMR().Bytes(), constants.ZERO_HASH[:]) {
 			break
 		}
-		next = hex.EncodeToString(db.Header.PrevKeyMR.Bytes())
+		next = hex.EncodeToString(db.GetHeader().GetPrevKeyMR().Bytes())
 	}
 
 	for i := len(dbs) - 1; i >= 0; i-- {
 		DirectoryBlocks = append(DirectoryBlocks, dbs[i])
 		fb := new(block.FBlock)
 		for _, dbe := range dbs[i].DBEntries {
-			if bytes.Equal(dbe.ChainID.Bytes(), common.FACTOID_CHAINID) {
-				hashstr := hex.EncodeToString(dbe.KeyMR.Bytes())
+			if bytes.Equal(dbe.GetChainID().Bytes(), constants.FACTOID_CHAINID) {
+				hashstr := hex.EncodeToString(dbe.GetKeyMR().Bytes())
 				fdata, err := factom.GetRaw(hashstr)
 				if err != nil {
 					panic(err.Error())

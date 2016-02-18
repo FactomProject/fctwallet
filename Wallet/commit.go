@@ -12,9 +12,11 @@ import (
 	"net/http"
 	"strings"
 
-	fct "github.com/FactomProject/factoid"
-	"github.com/FactomProject/factoid/wallet"
+	"github.com/FactomProject/factomd/common/constants"
+	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
+	"github.com/FactomProject/fctwallet/scwallet"
 )
 
 func CommitChain(name string, data []byte) error {
@@ -33,18 +35,27 @@ func CommitChain(name string, data []byte) error {
 		return fmt.Errorf("Could not decode message:", err)
 	}
 
-	var we fct.IBlock
+	var we interfaces.BinaryMarshallable
 
 	if Utility.IsValidAddress(name) && strings.HasPrefix(name, "EC") {
-		addr := fct.ConvertUserStrToAddress(name)
-		we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
+		addr := primitives.ConvertUserStrToAddress(name)
+		we, err = wallet.GetDB().Get([]byte(constants.W_ADDRESS_PUB_KEY), addr, new(scwallet.WalletEntry))
+		if err != nil {
+			return err
+		}
 	} else if Utility.IsValidHexAddress(name) {
 		addr, err := hex.DecodeString(name)
 		if err == nil {
-			we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
+			we, err = wallet.GetDB().Get([]byte(constants.W_ADDRESS_PUB_KEY), addr, new(scwallet.WalletEntry))
+			if err != nil {
+				return err
+			}
 		}
 	} else {
-		we = factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(name))
+		we, err = wallet.GetDB().Get([]byte(constants.W_NAME), []byte(name), new(scwallet.WalletEntry))
+		if err != nil {
+			return err
+		}
 	}
 
 	if we == nil {
@@ -53,8 +64,8 @@ func CommitChain(name string, data []byte) error {
 
 	signed := make([]byte, 0)
 	switch we.(type) {
-	case wallet.IWalletEntry:
-		signed = factoidState.GetWallet().SignCommit(we.(wallet.IWalletEntry), msg)
+	case interfaces.IWalletEntry:
+		signed = wallet.SignCommit(we.(interfaces.IWalletEntry), msg)
 	default:
 		return fmt.Errorf("Cannot use non Entry Credit Address for Chain Commit")
 	}
@@ -94,11 +105,14 @@ func CommitEntry(name string, data []byte) error {
 		return fmt.Errorf("Could not decode message:", err)
 	}
 
-	we := factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(name))
+	we, err := wallet.GetDB().Get([]byte(constants.W_NAME), []byte(name), new(scwallet.WalletEntry))
+	if err != nil {
+		return err
+	}
 	signed := make([]byte, 0)
 	switch we.(type) {
-	case wallet.IWalletEntry:
-		signed = factoidState.GetWallet().SignCommit(we.(wallet.IWalletEntry), msg)
+	case interfaces.IWalletEntry:
+		signed = wallet.SignCommit(we.(interfaces.IWalletEntry), msg)
 	default:
 		return fmt.Errorf("Cannot use non Entry Credit Address for Entry Commit")
 	}

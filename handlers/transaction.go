@@ -15,10 +15,10 @@ import (
 	"github.com/hoisie/web"
 	"strings"
 
-	fct "github.com/FactomProject/factoid"
-	"github.com/FactomProject/factoid/wallet"
-
-	"github.com/FactomProject/FactomCode/common"
+	"github.com/FactomProject/factomd/common/constants"
+	"github.com/FactomProject/factomd/common/factoid"
+	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/fctwallet/Wallet"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
 )
@@ -36,7 +36,7 @@ type Response struct {
 }
 
 func ValidateKey(key string) (msg string, valid bool) {
-	if len(key) > fct.ADDRESS_LENGTH {
+	if len(key) > constants.ADDRESS_LENGTH {
 		return "Key is too long.  Keys must be less than 32 characters", false
 	}
 	if badChar.FindStringIndex(key) != nil {
@@ -65,17 +65,17 @@ func reportResults(ctx *web.Context, response string, success bool) {
 	}
 }
 
-func getTransaction(ctx *web.Context, key string) (fct.ITransaction, error) {
+func getTransaction(ctx *web.Context, key string) (interfaces.ITransaction, error) {
 	return Wallet.GetTransaction(key)
 }
 
 // &key=<key>&name=<name or address>&amount=<amount>
 // If no amount is specified, a zero is returned.
 func getParams_(ctx *web.Context, params string, ec bool) (
-	trans fct.ITransaction,
+	trans interfaces.ITransaction,
 	key string,
 	name string,
-	address fct.IAddress,
+	address interfaces.IAddress,
 	amount int64,
 	ok bool) {
 
@@ -122,11 +122,16 @@ func getParams_(ctx *web.Context, params string, ec bool) (
 	// do a weird Address as a name and fool the code, but that seems unlikely.
 	// Could check for that some how, but there are many ways around such checks.
 
-	if len(name) <= fct.ADDRESS_LENGTH {
-		we := Wallet.GetRaw([]byte(fct.W_NAME), []byte(name))
+	if len(name) <= constants.ADDRESS_LENGTH {
+		we, err := Wallet.GetWalletEntry([]byte(name))
+		if err != nil {
+			reportResults(ctx, "Failure to locate the transaction", false)
+			ok = false
+			return
+		}
 		if we != nil {
-			address, err = we.(wallet.IWalletEntry).GetAddress()
-			if we.(wallet.IWalletEntry).GetType() == "ec" {
+			address, err = we.(interfaces.IWalletEntry).GetAddress()
+			if we.(interfaces.IWalletEntry).GetType() == "ec" {
 				if !ec {
 					reportResults(ctx, "Was Expecting a Factoid Address", false)
 					ok = false
@@ -148,15 +153,15 @@ func getParams_(ctx *web.Context, params string, ec bool) (
 			return
 		}
 	}
-	if (!ec && !fct.ValidateFUserStr(name)) || (ec && !fct.ValidateECUserStr(name)) {
+	if (!ec && !primitives.ValidateFUserStr(name)) || (ec && !primitives.ValidateECUserStr(name)) {
 		reportResults(ctx, fmt.Sprintf("The address specified isn't defined or is invalid: %s", name), false)
 		ctx.WriteHeader(httpBad)
 		ok = false
 		return
 	}
-	baddr := fct.ConvertUserStrToAddress(name)
+	baddr := primitives.ConvertUserStrToAddress(name)
 
-	address = fct.NewAddress(baddr)
+	address = factoid.NewAddress(baddr)
 
 	ok = true
 	return
@@ -384,7 +389,7 @@ func HandleFactoidAddFee(ctx *web.Context, parms string) {
 				"Addfee requires that all the inputs balance the outputs.\n"+
 					"The total inputs of your transaction are              %s\n"+
 					"The total outputs + ecoutputs of your transaction are %s",
-				fct.ConvertDecimal(ins), fct.ConvertDecimal(outs+ecs))
+				primitives.ConvertDecimalToPaddedString(ins), primitives.ConvertDecimalToPaddedString(outs+ecs))
 
 			reportResults(ctx, msg, false)
 			return
@@ -397,7 +402,7 @@ func HandleFactoidAddFee(ctx *web.Context, parms string) {
 		return
 	}
 
-	reportResults(ctx, fmt.Sprintf("Added %s to %s", fct.ConvertDecimal(uint64(transfee)), name), true)
+	reportResults(ctx, fmt.Sprintf("Added %s to %s", primitives.ConvertDecimalToPaddedString(uint64(transfee)), name), true)
 	return
 }
 
@@ -473,7 +478,7 @@ func GetFee(ctx *web.Context) (int64, error) {
 
 func HandleGetFee(ctx *web.Context, k string) {
 
-	var trans fct.ITransaction
+	var trans interfaces.ITransaction
 	var err error
 
 	key := ctx.Params["key"]
@@ -499,7 +504,7 @@ func HandleGetFee(ctx *web.Context, k string) {
 		fee = int64(ufee)
 	}
 
-	reportResults(ctx, fmt.Sprintf("%s", strings.TrimSpace(fct.ConvertDecimal(uint64(fee)))), true)
+	reportResults(ctx, fmt.Sprintf("%s", primitives.ConvertDecimalToString(uint64(fee))), true)
 }
 
 func GetAddresses() []byte {
@@ -523,7 +528,7 @@ func GetAddresses() []byte {
 			if err != nil {
 				continue
 			}
-			adr = fct.ConvertECAddressToUserStr(address)
+			adr = primitives.ConvertECAddressToUserStr(address)
 			ecAddresses = append(ecAddresses, adr)
 			ecKeys = append(ecKeys, string(we.GetName()))
 			bal, _ := ECBalance(adr)
@@ -533,11 +538,11 @@ func GetAddresses() []byte {
 			if err != nil {
 				continue
 			}
-			adr = fct.ConvertFctAddressToUserStr(address)
+			adr = primitives.ConvertFctAddressToUserStr(address)
 			fctAddresses = append(fctAddresses, adr)
 			fctKeys = append(fctKeys, string(we.GetName()))
 			bal, _ := FctBalance(adr)
-			sbal := fct.ConvertDecimal(uint64(bal))
+			sbal := primitives.ConvertDecimalToPaddedString(uint64(bal))
 			fctBalances = append(fctBalances, sbal)
 		}
 	}
@@ -607,7 +612,7 @@ func GetTransactions(ctx *web.Context) ([]byte, error) {
 			}
 			cprt = fmt.Sprintf(" Currently will pay: %s%s",
 				sign,
-				strings.TrimSpace(fct.ConvertDecimal(uint64(v))))
+				primitives.ConvertDecimalToString(uint64(v)))
 			if sign == "-" || fee > uint64(v) {
 				cprt = cprt + "\n\nWARNING: Currently your transaction fee may be too low"
 			}
@@ -615,7 +620,7 @@ func GetTransactions(ctx *web.Context) ([]byte, error) {
 
 		out.WriteString(fmt.Sprintf("%s:  Fee Due: %s  %s\n\n%s\n",
 			strings.TrimSpace(strings.TrimRight(string(keys[i]), "\u0000")),
-			strings.TrimSpace(fct.ConvertDecimal(fee)),
+			primitives.ConvertDecimalToString(fee),
 			cprt,
 			transactions[i].String()))
 	}
@@ -624,10 +629,13 @@ func GetTransactions(ctx *web.Context) ([]byte, error) {
 	// now look for the addresses, and replace them with our names. (the transactions
 	// in flight also have a Factom address... We leave those alone.
 
-	names, vs := Wallet.GetWalletNames()
+	names, vs, err := Wallet.GetWalletNames()
+	if err != nil {
+		return nil, err
+	}
 
 	for i, name := range names {
-		we, ok := vs[i].(wallet.IWalletEntry)
+		we, ok := vs[i].(interfaces.IWalletEntry)
 		if !ok {
 			return nil, fmt.Errorf("Database is corrupt")
 		}
@@ -666,7 +674,7 @@ func GetTransactionsj(ctx *web.Context) (string, error) {
 		trans = append(trans, p)
 	}
 
-	return common.EncodeJSONString(trans)
+	return primitives.EncodeJSONString(trans)
 
 }
 

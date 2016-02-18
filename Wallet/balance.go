@@ -13,22 +13,27 @@ import (
 	"strconv"
 	"strings"
 
-	fct "github.com/FactomProject/factoid"
-	"github.com/FactomProject/factoid/wallet"
+	"github.com/FactomProject/factomd/common/constants"
+	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
+	"github.com/FactomProject/fctwallet/scwallet"
 )
 
 func LookupAddress(adrType string, adr string) (string, error) {
 	if Utility.IsValidAddress(adr) && strings.HasPrefix(adr, adrType) {
-		baddr := fct.ConvertUserStrToAddress(adr)
+		baddr := primitives.ConvertUserStrToAddress(adr)
 		adr = hex.EncodeToString(baddr)
 	} else if Utility.IsValidHexAddress(adr) {
 		// the address is good enough.
 	} else if Utility.IsValidNickname(adr) {
-		we := factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(adr))
+		we, err := wallet.GetDB().Get([]byte(constants.W_NAME), []byte(adr), new(scwallet.WalletEntry))
+		if err != nil {
+			return "", err
+		}
 
 		if we != nil {
-			we2 := we.(wallet.IWalletEntry)
+			we2 := we.(interfaces.IWalletEntry)
 
 			if we2.GetType() == "ec" {
 				if strings.ToLower(adrType) == "fa" {

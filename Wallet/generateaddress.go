@@ -9,20 +9,22 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/FactomProject/factoid"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
+
+	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/factomd/common/primitives"
 )
 
 /*********************************************************************************************************/
 /********************************Factoid Addresses********************************************************/
 /*********************************************************************************************************/
 
-func GenerateAddress(name string) (factoid.IAddress, error) {
+func GenerateAddress(name string) (interfaces.IAddress, error) {
 	ok := Utility.IsValidKey(name)
 	if !ok {
 		return nil, fmt.Errorf("Invalid name or address")
 	}
-	addr, err := factoidState.GetWallet().GenerateFctAddress([]byte(name), 1, 1)
+	addr, err := wallet.GenerateFctAddress([]byte(name), 1, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -34,10 +36,10 @@ func GenerateAddressString(name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return factoid.ConvertFctAddressToUserStr(addr), nil
+	return primitives.ConvertFctAddressToUserStr(addr), nil
 }
 
-func GenerateAddressFromPrivateKey(name string, privateKey string) (factoid.IAddress, error) {
+func GenerateAddressFromPrivateKey(name string, privateKey string) (interfaces.IAddress, error) {
 	if Utility.IsValidKey(name) == false {
 		return nil, fmt.Errorf("Invalid name or address")
 	}
@@ -51,7 +53,7 @@ func GenerateAddressFromPrivateKey(name string, privateKey string) (factoid.IAdd
 	if err != nil {
 		return nil, err
 	}
-	addr, err := factoidState.GetWallet().GenerateFctAddressFromPrivateKey([]byte(name), priv, 1, 1)
+	addr, err := wallet.GenerateFctAddressFromPrivateKey([]byte(name), priv, 1, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -63,14 +65,14 @@ func GenerateAddressStringFromPrivateKey(name string, privateKey string) (string
 	if err != nil {
 		return "", err
 	}
-	return factoid.ConvertFctAddressToUserStr(addr), nil
+	return primitives.ConvertFctAddressToUserStr(addr), nil
 }
 
-func GenerateAddressFromHumanReadablePrivateKey(name string, privateKey string) (factoid.IAddress, error) {
+func GenerateAddressFromHumanReadablePrivateKey(name string, privateKey string) (interfaces.IAddress, error) {
 	if Utility.IsValidKey(name) == false {
 		return nil, fmt.Errorf("Invalid name or address")
 	}
-	addr, err := factoidState.GetWallet().GenerateFctAddressFromHumanReadablePrivateKey([]byte(name), privateKey, 1, 1)
+	addr, err := wallet.GenerateFctAddressFromHumanReadablePrivateKey([]byte(name), privateKey, 1, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -82,14 +84,14 @@ func GenerateAddressStringFromHumanReadablePrivateKey(name string, privateKey st
 	if err != nil {
 		return "", err
 	}
-	return factoid.ConvertFctAddressToUserStr(addr), nil
+	return primitives.ConvertFctAddressToUserStr(addr), nil
 }
 
-func GenerateAddressFromMnemonic(name string, privateKey string) (factoid.IAddress, error) {
+func GenerateAddressFromMnemonic(name string, privateKey string) (interfaces.IAddress, error) {
 	if Utility.IsValidKey(name) == false {
 		return nil, fmt.Errorf("Invalid name or address")
 	}
-	addr, err := factoidState.GetWallet().GenerateFctAddressFromMnemonic([]byte(name), privateKey, 1, 1)
+	addr, err := wallet.GenerateFctAddressFromMnemonic([]byte(name), privateKey, 1, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -101,19 +103,19 @@ func GenerateAddressStringFromMnemonic(name string, privateKey string) (string, 
 	if err != nil {
 		return "", err
 	}
-	return factoid.ConvertFctAddressToUserStr(addr), nil
+	return primitives.ConvertFctAddressToUserStr(addr), nil
 }
 
 /*********************************************************************************************************/
 /*************************************EC Addresses********************************************************/
 /*********************************************************************************************************/
 
-func GenerateECAddress(name string) (factoid.IAddress, error) {
+func GenerateECAddress(name string) (interfaces.IAddress, error) {
 	ok := Utility.IsValidKey(name)
 	if !ok {
 		return nil, fmt.Errorf("Invalid name or address")
 	}
-	addr, err := factoidState.GetWallet().GenerateECAddress([]byte(name))
+	addr, err := wallet.GenerateECAddress([]byte(name))
 	if err != nil {
 		return nil, err
 	}
@@ -125,10 +127,10 @@ func GenerateECAddressString(name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return factoid.ConvertECAddressToUserStr(addr), nil
+	return primitives.ConvertECAddressToUserStr(addr), nil
 }
 
-func GenerateECAddressFromPrivateKey(name string, privateKey string) (factoid.IAddress, error) {
+func GenerateECAddressFromPrivateKey(name string, privateKey string) (interfaces.IAddress, error) {
 	if Utility.IsValidKey(name) == false {
 		return nil, fmt.Errorf("Invalid name or address")
 	}
@@ -142,7 +144,7 @@ func GenerateECAddressFromPrivateKey(name string, privateKey string) (factoid.IA
 	if err != nil {
 		return nil, err
 	}
-	addr, err := factoidState.GetWallet().GenerateECAddressFromPrivateKey([]byte(name), priv)
+	addr, err := wallet.GenerateECAddressFromPrivateKey([]byte(name), priv)
 	if err != nil {
 		return nil, err
 	}
@@ -154,14 +156,14 @@ func GenerateECAddressStringFromPrivateKey(name string, privateKey string) (stri
 	if err != nil {
 		return "", err
 	}
-	return factoid.ConvertECAddressToUserStr(addr), nil
+	return primitives.ConvertECAddressToUserStr(addr), nil
 }
 
-func GenerateECAddressFromHumanReadablePrivateKey(name string, privateKey string) (factoid.IAddress, error) {
+func GenerateECAddressFromHumanReadablePrivateKey(name string, privateKey string) (interfaces.IAddress, error) {
 	if Utility.IsValidKey(name) == false {
 		return nil, fmt.Errorf("Invalid name or address")
 	}
-	addr, err := factoidState.GetWallet().GenerateECAddressFromHumanReadablePrivateKey([]byte(name), privateKey)
+	addr, err := wallet.GenerateECAddressFromHumanReadablePrivateKey([]byte(name), privateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +175,7 @@ func GenerateECAddressStringFromHumanReadablePrivateKey(name string, privateKey 
 	if err != nil {
 		return "", err
 	}
-	return factoid.ConvertECAddressToUserStr(addr), nil
+	return primitives.ConvertECAddressToUserStr(addr), nil
 }
 
 /*********************************************************************************************************/
@@ -185,22 +187,22 @@ func VerifyAddressType(address string) (string, bool) {
 	var pass bool = false
 
 	if strings.HasPrefix(address, "FA") {
-		if factoid.ValidateFUserStr(address) {
+		if primitives.ValidateFUserStr(address) {
 			resp = "Factoid - Public"
 			pass = true
 		}
 	} else if strings.HasPrefix(address, "EC") {
-		if factoid.ValidateECUserStr(address) {
+		if primitives.ValidateECUserStr(address) {
 			resp = "Entry Credit - Public"
 			pass = true
 		}
 	} else if strings.HasPrefix(address, "Fs") {
-		if factoid.ValidateFPrivateUserStr(address) {
+		if primitives.ValidateFPrivateUserStr(address) {
 			resp = "Factoid - Private"
 			pass = true
 		}
 	} else if strings.HasPrefix(address, "Es") {
-		if factoid.ValidateECPrivateUserStr(address) {
+		if primitives.ValidateECPrivateUserStr(address) {
 			resp = "Entry Credit - Private"
 			pass = true
 		}
@@ -208,7 +210,7 @@ func VerifyAddressType(address string) (string, bool) {
 
 	//  Add Netki resolution here
 	//else if (checkNetki) {
-	//	if (factoid.ValidateECPrivateUserStr(address)) {
+	//	if (primitives.ValidateECPrivateUserStr(address)) {
 	//		resp = "{\"AddressType\":\"Factoid - Public\", \"TypeCode\":4 ,\"Success\":true}"
 	//	}
 	//}

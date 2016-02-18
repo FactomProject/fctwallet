@@ -8,9 +8,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	fct "github.com/FactomProject/factoid"
-	"github.com/FactomProject/factoid/wallet"
 	"github.com/FactomProject/factom"
+	"github.com/FactomProject/factomd/common/constants"
+	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/fctwallet/scwallet"
 )
 
 func ComposeChainSubmit(name string, data []byte) ([]byte, error) {
@@ -27,13 +28,16 @@ func ComposeChainSubmit(name string, data []byte) ([]byte, error) {
 	c := factom.NewChain(e)
 
 	sub := new(chainsubmit)
-	we := factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(name))
+	we, err := wallet.GetDB().Get([]byte(constants.W_NAME), []byte(name), new(scwallet.WalletEntry))
+	if err != nil {
+		return nil, err
+	}
 	switch we.(type) {
-	case wallet.IWalletEntry:
-		pub := new([fct.ADDRESS_LENGTH]byte)
-		copy(pub[:], we.(wallet.IWalletEntry).GetKey(0))
-		pri := new([fct.PRIVATE_LENGTH]byte)
-		copy(pri[:], we.(wallet.IWalletEntry).GetPrivKey(0))
+	case interfaces.IWalletEntry:
+		pub := new([constants.ADDRESS_LENGTH]byte)
+		copy(pub[:], we.(interfaces.IWalletEntry).GetKey(0))
+		pri := new([constants.PRIVATE_LENGTH]byte)
+		copy(pri[:], we.(interfaces.IWalletEntry).GetPrivKey(0))
 
 		sub.ChainID = c.ChainID
 
@@ -68,13 +72,16 @@ func ComposeEntrySubmit(name string, data []byte) ([]byte, error) {
 	}
 
 	sub := new(entrysubmit)
-	we := factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(name))
+	we, err := wallet.GetDB().Get([]byte(constants.W_NAME), []byte(name), new(scwallet.WalletEntry))
+	if err != nil {
+		return nil, err
+	}
 	switch we.(type) {
-	case wallet.IWalletEntry:
-		pub := new([fct.ADDRESS_LENGTH]byte)
-		copy(pub[:], we.(wallet.IWalletEntry).GetKey(0))
-		pri := new([fct.PRIVATE_LENGTH]byte)
-		copy(pri[:], we.(wallet.IWalletEntry).GetPrivKey(0))
+	case interfaces.IWalletEntry:
+		pub := new([constants.ADDRESS_LENGTH]byte)
+		copy(pub[:], we.(interfaces.IWalletEntry).GetKey(0))
+		pri := new([constants.PRIVATE_LENGTH]byte)
+		copy(pri[:], we.(interfaces.IWalletEntry).GetPrivKey(0))
 
 		if j, err := factom.ComposeEntryCommit(pub, pri, e); err != nil {
 			return nil, err
