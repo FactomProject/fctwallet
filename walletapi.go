@@ -6,13 +6,10 @@ package main
 
 import (
 	"fmt"
-	fct "github.com/FactomProject/factoid"
 	"github.com/FactomProject/fctwallet/handlers"
 	"github.com/hoisie/web"
 	"time"
 )
-
-var _ = fct.Address{}
 
 var server = web.NewServer()
 

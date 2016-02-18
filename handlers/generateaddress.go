@@ -5,10 +5,11 @@
 package handlers
 
 import (
+	"github.com/hoisie/web"
+
 	fct "github.com/FactomProject/factoid"
 	"github.com/FactomProject/fctwallet/Wallet"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
-	"github.com/hoisie/web"
 )
 
 var _ = fct.Address{}

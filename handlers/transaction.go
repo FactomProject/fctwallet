@@ -12,11 +12,11 @@ import (
 	"regexp"
 	"strconv"
 	//"time"
+	"github.com/hoisie/web"
 	"strings"
 
 	fct "github.com/FactomProject/factoid"
 	"github.com/FactomProject/factoid/wallet"
-	"github.com/hoisie/web"
 
 	"github.com/FactomProject/FactomCode/common"
 	"github.com/FactomProject/fctwallet/Wallet"

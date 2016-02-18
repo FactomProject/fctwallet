@@ -5,8 +5,9 @@
 package Utility
 
 import (
-	fct "github.com/FactomProject/factoid"
 	"regexp"
+
+	fct "github.com/FactomProject/factoid"
 )
 
 var badChar, _ = regexp.Compile("[^A-Za-z0-9_-]")                                                      //alphanumeric plus _-

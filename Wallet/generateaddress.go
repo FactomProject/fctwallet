@@ -7,9 +7,10 @@ package Wallet
 import (
 	"encoding/hex"
 	"fmt"
+	"strings"
+
 	"github.com/FactomProject/factoid"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
-	"strings"
 )
 
 /*********************************************************************************************************/

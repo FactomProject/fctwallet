@@ -8,11 +8,12 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"github.com/hoisie/web"
+
 	"github.com/FactomProject/FactomCode/common"
 	"github.com/FactomProject/factoid/block"
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/fctwallet/Wallet"
-	"github.com/hoisie/web"
 )
 
 // Older blocks smaller indexes.  All the Factoid Directory blocks

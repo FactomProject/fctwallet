@@ -2,8 +2,9 @@ package Utility_test
 
 import (
 	//"fmt"
-	"github.com/FactomProject/fctwallet/Wallet/Utility"
 	"testing"
+
+	"github.com/FactomProject/fctwallet/Wallet/Utility"
 )
 
 func TestIsValidHexAddress(t *testing.T) {
