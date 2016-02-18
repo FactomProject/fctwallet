@@ -164,10 +164,8 @@ func HandleVerifyAddressType(ctx *web.Context, params string) {
 
 	address := ctx.Params["address"]
 
-  	resp,pass := Wallet.VerifyAddressType(address)
-
+	resp, pass := Wallet.VerifyAddressType(address)
 
 	reportResults(ctx, resp, pass)
-	return 
+	return
 }
-

@@ -7,7 +7,7 @@ package handlers
 import (
 	"fmt"
 	"io/ioutil"
-	
+
 	"github.com/FactomProject/fctwallet/Wallet"
 	"github.com/hoisie/web"
 )
