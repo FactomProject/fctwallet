@@ -49,7 +49,7 @@ func FactoidNewTransaction(key string) error {
 		return fmt.Errorf("Duplicate key: '%s'", key)
 	}
 	// Create a transaction
-	t = wallet.CreateTransaction(primitives.GetTimeMilli())
+	t = wallet.CreateTransaction(interfaces.GetTimeMilli())
 	// Save it with the key
 	return wallet.GetDB().Put([]byte(constants.DB_BUILD_TRANS), []byte(key), t)
 }
