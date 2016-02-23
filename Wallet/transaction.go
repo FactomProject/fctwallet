@@ -346,13 +346,20 @@ func GetFee() (int64, error) {
 	}
 	resp.Body.Close()
 
-	type x struct{ Fee int64 }
+	fmt.Println("GetFee",string(body))
+	
+	type x struct{ 
+		Response struct {
+			Fee int64 
+		}
+		Success bool
+	}
 	b := new(x)
 	if err := json.Unmarshal(body, b); err != nil {
 		return 0, err
 	}
 
-	return b.Fee, nil
+	return b.Response.Fee, nil
 }
 
 func GetProperties() (protocol, factomd, fctwallet string, err error) {
