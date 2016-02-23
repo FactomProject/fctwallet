@@ -114,6 +114,14 @@ func FactoidAddFee(trans interfaces.ITransaction, key string, address interfaces
 				return 0, err
 			}
 			input.SetAmount(amt)
+
+			// Update our map with our new transaction to the same key. Otherwise, all
+			// of our work will go away!
+			err =  wallet.GetDB().Put([]byte(constants.DB_BUILD_TRANS), []byte(key), trans)
+			if err != nil {
+				return 0, err
+			}
+
 			return transfee, nil
 		}
 	}
