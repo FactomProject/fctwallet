@@ -110,10 +110,10 @@ func HandleV2PostRequest(j *primitives.JSON2Request) (*primitives.JSON2Response,
 }
 
 func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, *primitives.JSONError) {
-	//params := j.Params
+	params := j.Params
 	var resp interface{}
 	var jsonError *primitives.JSONError
-/*
+
 	switch j.Method {
 	case "factoid-balance":
 		resp, jsonError = HandleV2FactoidBalance(params)
@@ -121,7 +121,7 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 	case "entry-credit-balance":
 		resp, jsonError = HandleV2EntryCreditBalance(params)
 		break
-	case "factoid-generate-address":
+	/*case "factoid-generate-address":
 		resp, jsonError = HandleV2FactoidGenerateAddress(params)
 		break
 	case "factoid-generate-ec-address":
@@ -168,8 +168,8 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 		break
 	case "factoid-get-transactionsj":
 		resp, jsonError = HandleV2GetTransactionsj(params)
-		break
-	}*/
+		break*/
+	}
 
 	if jsonError != nil {
 		return nil, jsonError

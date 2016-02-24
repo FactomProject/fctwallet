@@ -16,7 +16,9 @@ import (
 	"github.com/FactomProject/factomd/common/constants"
 	"github.com/FactomProject/factomd/common/directoryBlock"
 	"github.com/FactomProject/factomd/common/factoid/block"
+	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/factomd/wsapi"
 )
 
 // Older blocks smaller indexes.  All the Factoid Directory blocks
@@ -116,22 +118,60 @@ func ECBalance(adr string) (int64, error) {
 }
 
 func HandleEntryCreditBalance(ctx *web.Context, adr string) {
-	v, err := ECBalance(adr)
-	if err != nil {
-		reportResults(ctx, err.Error(), false)
+	req := primitives.NewJSON2Request(1, adr, "entry-credit-balance")
+
+	jsonResp, jsonError := HandleV2GetRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
 		return
 	}
-	str := fmt.Sprintf("%d", v)
+
+	str := fmt.Sprintf("%d", jsonResp.Result.(*EntryCreditBalanceResponse).Balance)
 	reportResults(ctx, str, true)
 }
 
 func HandleFactoidBalance(ctx *web.Context, adr string) {
-	v, err := FctBalance(adr)
-	if err != nil {
-		reportResults(ctx, err.Error(), false)
+	req := primitives.NewJSON2Request(1, adr, "factoid-balance")
+
+	jsonResp, jsonError := HandleV2GetRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
 		return
 	}
 
-	str := fmt.Sprintf("%d", v)
+	str := fmt.Sprintf("%d", jsonResp.Result.(*FactoidCreditBalance).Balance)
 	reportResults(ctx, str, true)
+}
+
+
+func HandleV2EntryCreditBalance(params interface{}) (interface{}, *primitives.JSONError) {
+	adr, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	v, err := ECBalance(adr)
+	if err != nil {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+	resp:=new(EntryCreditBalanceResponse)
+	resp.Balance = v
+
+	return resp, nil
+}
+
+func HandleV2FactoidBalance(params interface{}) (interface{}, *primitives.JSONError) {
+	adr, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	v, err := FctBalance(adr)
+	if err != nil {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+	resp:=new(FactoidCreditBalance)
+	resp.Balance = v
+
+	return resp, nil
 }
