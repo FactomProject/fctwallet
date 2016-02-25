@@ -25,7 +25,6 @@ var DBHeadStr string = ""
 // Otherwise return false.
 func getDBHead() bool {
 	db, err := factom.GetDBlockHead()
-	
 	if err != nil {
 		panic(err.Error())
 	}

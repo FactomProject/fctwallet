@@ -6,10 +6,13 @@ package main
 
 import (
 	"fmt"
-	fct "github.com/FactomProject/factoid"
-	"github.com/FactomProject/fctwallet/handlers"
-	"github.com/hoisie/web"
 	"time"
+
+	fct "github.com/FactomProject/factoid"
+	"github.com/FactomProject/factom"
+	"github.com/FactomProject/fctwallet/handlers"
+	"github.com/FactomProject/FactomCode/util"
+	"github.com/hoisie/web"
 )
 
 var _ = fct.Address{}
@@ -177,11 +180,13 @@ func Start() {
 }
 
 func main() {
-
 	fmt.Println("+================+")
 	fmt.Println("|  fctwallet v1  |")
 	fmt.Println("+================+")
 
+	cfg := util.ReadConfig().Wallet
+	
+	factom.SetServer(fmt.Sprintf("%s:%d", cfg.FactomdAddress, cfg.FactomdPort))
 	Start()
 	for {
 		time.Sleep(time.Second)
