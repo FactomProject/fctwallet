@@ -11,6 +11,28 @@ import (
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
 )
 
+func HandleV2FactoidGenerateAddress(params interface{}) (interface{}, *primitives.JSONError) {
+	name, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	if Utility.IsValidKey(name) == false {
+		return nil, NewInvalidNameError()
+	}
+
+	adrstr, err := Wallet.GenerateAddressString(name)
+	if err != nil {
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+
+	resp:=new(GenerateAddressResponse)
+	resp.Address = adrstr
+
+	return resp, nil
+}
+
+
 func HandleFactoidGenerateAddress(ctx *web.Context, name string) {
 	if Utility.IsValidKey(name) == false {
 		reportResults(ctx, "Name provided is not valid", false)

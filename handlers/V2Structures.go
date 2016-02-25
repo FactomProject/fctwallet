@@ -5,8 +5,13 @@
 package handlers
 
 import (
-
+	"github.com/FactomProject/factomd/common/primitives"
 )
+
+
+func NewInvalidNameError() *primitives.JSONError {
+	return primitives.NewJSONError(-32602, "Invalid params", "Name provided is not valid")
+}
 
 type RequestParams struct {
 
@@ -16,6 +21,10 @@ type EntryCreditBalanceResponse struct {
 	Balance int64
 }
 
-type FactoidCreditBalance struct {
+type FactoidBalanceResponse struct {
 	Balance int64
+}
+
+type GenerateAddressResponse struct {
+	Address string
 }

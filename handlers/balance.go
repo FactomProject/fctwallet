@@ -170,7 +170,7 @@ func HandleV2FactoidBalance(params interface{}) (interface{}, *primitives.JSONEr
 	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
-	resp:=new(FactoidCreditBalance)
+	resp:=new(FactoidBalanceResponse)
 	resp.Balance = v
 
 	return resp, nil
