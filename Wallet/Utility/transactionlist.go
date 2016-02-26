@@ -148,29 +148,37 @@ func filtertransaction(trans fct.ITransaction, addresses [][]byte) bool {
 	return true
 }
 
-func DumpTransactionsJSON(addresses [][]byte) ([]byte, error) {
+func DumpTransactionsJSON(addresses [][]byte, start int, end int) ([]byte, error) {
 	if err := refresh(); err != nil {
 		return nil, err
+	}
+	
+	fmt.Println("\nStart", start, "End", end,"\n")
+	
+	if end == 0 {
+		end = 1000000000	// No end, set to big number.
 	}
 
 	var transactions []fct.ITransaction
 	
 	for i,fb := range FactoidBlocks {
-		for _, t := range fb.GetTransactions() {
-			t.SetBlockHeight(i)
-			t.GetSigHash()
-			for _,input := range t.GetInputs() {
-				input.SetUserAddress(fct.ConvertFctAddressToUserStr(input.GetAddress()))
-			}
-			for _,output := range t.GetOutputs() {
-				output.SetUserAddress(fct.ConvertFctAddressToUserStr(output.GetAddress()))
-			}
-			for _,ecoutput := range t.GetECOutputs() {
-				ecoutput.SetUserAddress(fct.ConvertECAddressToUserStr(ecoutput.GetAddress()))
-			}
-			prtTrans := filtertransaction(t,addresses)
-			if prtTrans {
-				transactions = append(transactions, t)
+		if fb.GetDBHeight() >= uint32(start) && fb.GetDBHeight() <= uint32(end) {
+			for _, t := range fb.GetTransactions() {
+				t.SetBlockHeight(i)
+				t.GetSigHash()
+				for _,input := range t.GetInputs() {
+					input.SetUserAddress(fct.ConvertFctAddressToUserStr(input.GetAddress()))
+				}
+				for _,output := range t.GetOutputs() {
+					output.SetUserAddress(fct.ConvertFctAddressToUserStr(output.GetAddress()))
+				}
+				for _,ecoutput := range t.GetECOutputs() {
+					ecoutput.SetUserAddress(fct.ConvertECAddressToUserStr(ecoutput.GetAddress()))
+				}
+				prtTrans := filtertransaction(t,addresses)
+				if prtTrans {
+					transactions = append(transactions, t)
+				}
 			}
 		}
 	}
