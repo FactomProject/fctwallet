@@ -152,9 +152,7 @@ func DumpTransactionsJSON(addresses [][]byte, start int, end int) ([]byte, error
 	if err := refresh(); err != nil {
 		return nil, err
 	}
-	
-	fmt.Println("\nStart", start, "End", end,"\n")
-	
+		
 	if end == 0 {
 		end = 1000000000	// No end, set to big number.
 	}
