@@ -12,7 +12,7 @@ import (
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/fctwallet/handlers"
 	"github.com/FactomProject/FactomCode/util"
-	"github.com/hoisie/web"
+	"github.com/FactomProject/web"
 )
 
 var _ = fct.Address{}
