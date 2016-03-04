@@ -5,7 +5,7 @@
 package handlers
 
 import (
-	"github.com/hoisie/web"
+	"github.com/FactomProject/web"
 	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/factomd/wsapi"
 	"io/ioutil"

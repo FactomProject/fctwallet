@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"github.com/hoisie/web"
+	"github.com/FactomProject/web"
 
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/fctwallet/Wallet"
@@ -139,7 +139,7 @@ func HandleFactoidBalance(ctx *web.Context, adr string) {
 		return
 	}
 
-	str := fmt.Sprintf("%d", jsonResp.Result.(*FactoidCreditBalance).Balance)
+	str := fmt.Sprintf("%d", jsonResp.Result.(*FactoidBalanceResponse).Balance)
 	reportResults(ctx, str, true)
 }
 
