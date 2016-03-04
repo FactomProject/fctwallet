@@ -15,6 +15,8 @@ func NewInvalidNameError() *primitives.JSONError {
 type RequestParams struct {
 }
 
+//Balance
+
 type EntryCreditBalanceResponse struct {
 	Balance int64
 }
@@ -23,6 +25,13 @@ type FactoidBalanceResponse struct {
 	Balance int64
 }
 
+//Generateaddress
+
 type GenerateAddressResponse struct {
 	Address string
+}
+
+type VerifyAddressTypeResponse struct {
+	Type string
+	Valid bool
 }

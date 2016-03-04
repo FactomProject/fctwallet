@@ -177,15 +177,29 @@ func HandleFactoidGenerateAddressFromMnemonic(ctx *web.Context, params string) {
 }
 
 /*********************************************************************************************************/
-/*********************************************check address type******************************************/
-/*********************************************************************************************************/
+/*********************************************Check address type******************************************/
 /*********************************************************************************************************/
 func HandleVerifyAddressType(ctx *web.Context, params string) {
-
 	address := ctx.Params["address"]
+
+	answer, err:=HandleV2VerifyAddressType(address)
+	if err!=nil {
+		reportResults(ctx, err.Error(), false)
+	}
+
+	reportResults(ctx, answer.(*VerifyAddressTypeResponse).Type, answer.(*VerifyAddressTypeResponse).Valid)
+}
+
+func HandleV2VerifyAddressType(params interface{}) (interface{}, *primitives.JSONError) {
+	address, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
 
 	resp, pass := Wallet.VerifyAddressType(address)
 
-	reportResults(ctx, resp, pass)
-	return
+	answer:=new(VerifyAddressTypeResponse)
+	answer.Type = resp
+	answer.Valid = pass
+	return answer, nil
 }
