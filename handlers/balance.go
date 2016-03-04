@@ -16,8 +16,8 @@ import (
 	"github.com/FactomProject/factomd/common/constants"
 	"github.com/FactomProject/factomd/common/directoryBlock"
 	"github.com/FactomProject/factomd/common/factoid/block"
-	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/factomd/wsapi"
 )
 
@@ -143,7 +143,6 @@ func HandleFactoidBalance(ctx *web.Context, adr string) {
 	reportResults(ctx, str, true)
 }
 
-
 func HandleV2EntryCreditBalance(params interface{}) (interface{}, *primitives.JSONError) {
 	adr, ok := params.(string)
 	if ok == false {
@@ -154,7 +153,7 @@ func HandleV2EntryCreditBalance(params interface{}) (interface{}, *primitives.JS
 	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
-	resp:=new(EntryCreditBalanceResponse)
+	resp := new(EntryCreditBalanceResponse)
 	resp.Balance = v
 
 	return resp, nil
@@ -170,7 +169,7 @@ func HandleV2FactoidBalance(params interface{}) (interface{}, *primitives.JSONEr
 	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
-	resp:=new(FactoidBalanceResponse)
+	resp := new(FactoidBalanceResponse)
 	resp.Balance = v
 
 	return resp, nil

@@ -7,9 +7,9 @@ package handlers
 import (
 	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/factomd/wsapi"
-	"github.com/FactomProject/web"
 	"github.com/FactomProject/fctwallet/Wallet"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
+	"github.com/FactomProject/web"
 )
 
 func HandleV2FactoidGenerateAddress(params interface{}) (interface{}, *primitives.JSONError) {
@@ -27,12 +27,11 @@ func HandleV2FactoidGenerateAddress(params interface{}) (interface{}, *primitive
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	resp:=new(GenerateAddressResponse)
+	resp := new(GenerateAddressResponse)
 	resp.Address = adrstr
 
 	return resp, nil
 }
-
 
 func HandleFactoidGenerateAddress(ctx *web.Context, name string) {
 	if Utility.IsValidKey(name) == false {

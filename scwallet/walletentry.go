@@ -128,10 +128,10 @@ func (w *WalletEntry) UnmarshalBinaryData(data []byte) ([]byte, error) {
 	}
 	data = data[1:]
 
-	len, data := binary.BigEndian.Uint16(data[0:2]), data[2:]
-	n := make([]byte, len, len) // build a place for the name
-	copy(n, data[:len])         // copy it into that place
-	data = data[len:]           // update data pointer
+	siz, data := binary.BigEndian.Uint16(data[0:2]), data[2:]
+	n := make([]byte, siz, siz) // build a place for the name
+	copy(n, data[:siz])         // copy it into that place
+	data = data[siz:]           // update data pointer
 	w.name = n                  // Finally!  set the name
 
 	if w.rcd == nil {
@@ -143,7 +143,7 @@ func (w *WalletEntry) UnmarshalBinaryData(data []byte) ([]byte, error) {
 	}
 
 	blen, data := data[0], data[1:]
-	w.public = make([][]byte, len, len)
+	w.public = make([][]byte, blen, blen)
 	for i := 0; i < int(blen); i++ {
 		w.public[i] = make([]byte, constants.ADDRESS_LENGTH, constants.ADDRESS_LENGTH)
 		copy(w.public[i], data[:constants.ADDRESS_LENGTH])
@@ -151,11 +151,11 @@ func (w *WalletEntry) UnmarshalBinaryData(data []byte) ([]byte, error) {
 	}
 
 	blen, data = data[0], data[1:]
-	w.private = make([][]byte, len, len)
+	w.private = make([][]byte, blen, blen)
 	for i := 0; i < int(blen); i++ {
-		w.private[i] = make([]byte, constants.PRIVATE_LENGTH, constants.PRIVATE_LENGTH)
-		copy(w.private[i], data[:constants.PRIVATE_LENGTH])
-		data = data[constants.PRIVATE_LENGTH:]
+		w.private[i] = make([]byte, constants.ADDRESS_LENGTH, constants.ADDRESS_LENGTH)
+		copy(w.private[i], data[:constants.ADDRESS_LENGTH])
+		data = data[constants.ADDRESS_LENGTH:]
 	}
 	return data, nil
 }

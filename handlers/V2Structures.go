@@ -8,13 +8,11 @@ import (
 	"github.com/FactomProject/factomd/common/primitives"
 )
 
-
 func NewInvalidNameError() *primitives.JSONError {
 	return primitives.NewJSONError(-32602, "Invalid params", "Name provided is not valid")
 }
 
 type RequestParams struct {
-
 }
 
 type EntryCreditBalanceResponse struct {

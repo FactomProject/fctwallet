@@ -117,7 +117,7 @@ func FactoidAddFee(trans interfaces.ITransaction, key string, address interfaces
 
 			// Update our map with our new transaction to the same key. Otherwise, all
 			// of our work will go away!
-			err =  wallet.GetDB().Put([]byte(constants.DB_BUILD_TRANS), []byte(key), trans)
+			err = wallet.GetDB().Put([]byte(constants.DB_BUILD_TRANS), []byte(key), trans)
 			if err != nil {
 				return 0, err
 			}
@@ -247,17 +247,20 @@ func FactoidSubmit(jsonkey string) (string, error) {
 
 	err = wallet.ValidateSignatures(trans)
 	if err != nil {
+		fmt.Println(err)
 		return "", err
 	}
 
 	err = isReasonableFee(trans)
 	if err != nil {
+		fmt.Println(err)
 		return "", err
 	}
 
 	// Okay, transaction is good, so marshal and send to factomd!
 	data, err := trans.MarshalBinary()
 	if err != nil {
+		fmt.Println(err)
 		return "", err
 	}
 
@@ -267,6 +270,7 @@ func FactoidSubmit(jsonkey string) (string, error) {
 
 	j, err := json.Marshal(s)
 	if err != nil {
+		fmt.Println(err)
 		return "", err
 	}
 
@@ -354,11 +358,11 @@ func GetFee() (int64, error) {
 	}
 	resp.Body.Close()
 
-	fmt.Println("GetFee",string(body))
-	
-	type x struct{ 
+	fmt.Println("GetFee", string(body))
+
+	type x struct {
 		Response struct {
-			Fee int64 
+			Fee int64
 		}
 		Success bool
 	}
