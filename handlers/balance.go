@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"bytes"
 	"encoding/hex"
-	"github.com/hoisie/web"
+	"github.com/FactomProject/web"
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factoid/block"
 	"github.com/FactomProject/fctwallet/Wallet"
@@ -25,7 +25,6 @@ var DBHeadStr string = ""
 // Otherwise return false.
 func getDBHead() bool {
 	db, err := factom.GetDBlockHead()
-	
 	if err != nil {
 		panic(err.Error())
 	}

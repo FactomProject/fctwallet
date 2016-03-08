@@ -9,7 +9,7 @@ import (
 	"io/ioutil"
 	
 	"github.com/FactomProject/fctwallet/Wallet"
-	"github.com/hoisie/web"
+	"github.com/FactomProject/web"
 )
 
 func HandleComposeEntrySubmit(ctx *web.Context, name string) {
