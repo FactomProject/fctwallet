@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"bytes"
 	"encoding/hex"
+	"encoding/json"
 	"github.com/FactomProject/web"
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factoid/block"
@@ -131,3 +132,27 @@ func HandleFactoidBalance(ctx *web.Context, adr string) {
 	reportResults(ctx, str, true)
 }
 
+func HandleResolveAddress(ctx *web.Context, adr string) {
+	type x struct {
+		Fct, Ec string
+	}
+	
+	f, e, err := Wallet.NetkiResolve(adr)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+		return
+	}
+
+	var str string
+	t := new(x)
+	t.Fct = f
+	t.Ec = e
+	if p, err := json.Marshal(t); err != nil {
+		reportResults(ctx, err.Error(), false)
+		return
+	} else {
+		str = string(p)
+	}
+		
+	reportResults(ctx, str, true)
+}

@@ -16,7 +16,6 @@ import (
 	fct "github.com/FactomProject/factoid"
 	"github.com/FactomProject/factoid/wallet"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
-	netki "github.com/netkicorp/go-partner-client"
 )
 
 func LookupAddress(adrType string, adr string) (string, error) {
@@ -46,25 +45,8 @@ func LookupAddress(adrType string, adr string) (string, error) {
 		} else {
 			return "", fmt.Errorf("Name %s is undefined.", adr)
 		}
-	} else {
-		// try and resolve the user input as a netki named wallet
-		if strings.ToLower(adrType) == "fct" {
-			addr, err := netki.WalletNameLookup(adr, "fct")
-			if err != nil {
-				return "", fmt.Errorf("Invalid Name.  Check that you have entered the name correctly.")
-			}
-			baddr := fct.ConvertUserStrToAddress(addr)
-			adr = hex.EncodeToString(baddr)
-		} else if strings.ToLower(adrType) == "ec" {
-			addr, err := netki.WalletNameLookup(adr, "fec")
-			if err != nil {
-				return "", fmt.Errorf("Invalid Name.  Check that you have entered the name correctly.")
-			}
-			baddr := fct.ConvertUserStrToAddress(addr)
-			adr = hex.EncodeToString(baddr)
-		}
 	}
-
+	
 	return adr, nil
 }
 
