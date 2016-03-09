@@ -339,7 +339,7 @@ func isReasonableFee(trans interfaces.ITransaction) error {
 	}
 
 	if cfee < sreqFee {
-		return fmt.Errorf("Insufficient fee")
+		return fmt.Errorf("Insufficient fee - %v vs %v", cfee, sreqFee)
 	}
 
 	return nil

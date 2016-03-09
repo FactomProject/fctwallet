@@ -359,41 +359,44 @@ func HandleProperties(ctx *web.Context) {
 
 }
 
-func HandleFactoidAddFee(ctx *web.Context, parms string) {
-	trans, key, _, address, _, ok := getParams_(ctx, parms, false)
+func HandleFactoidAddFee(ctx *web.Context, params string) {
+	trans, key, _, address, _, ok := getParams_(ctx, params, false)
 	if !ok {
+		fmt.Println("Not OK")
 		return
 	}
 
 	name := ctx.Params["name"] // This is the name the user used.
 
-	{
-		ins, err := trans.TotalInputs()
-		if err != nil {
-			reportResults(ctx, err.Error(), false)
-			return
-		}
-		outs, err := trans.TotalOutputs()
-		if err != nil {
-			reportResults(ctx, err.Error(), false)
-			return
-		}
-		ecs, err := trans.TotalECs()
-		if err != nil {
-			reportResults(ctx, err.Error(), false)
-			return
-		}
+	ins, err := trans.TotalInputs()
+	if err != nil {
+		fmt.Println(err.Error())
+		reportResults(ctx, err.Error(), false)
+		return
+	}
+	outs, err := trans.TotalOutputs()
+	if err != nil {
+		fmt.Println(err.Error())
+		reportResults(ctx, err.Error(), false)
+		return
+	}
+	ecs, err := trans.TotalECs()
+	if err != nil {
+		fmt.Println(err.Error())
+		reportResults(ctx, err.Error(), false)
+		return
+	}
 
-		if ins != outs+ecs {
-			msg := fmt.Sprintf(
-				"Addfee requires that all the inputs balance the outputs.\n"+
-					"The total inputs of your transaction are              %s\n"+
-					"The total outputs + ecoutputs of your transaction are %s",
-				primitives.ConvertDecimalToPaddedString(ins), primitives.ConvertDecimalToPaddedString(outs+ecs))
+	if ins != outs+ecs {
+		msg := fmt.Sprintf(
+			"Addfee requires that all the inputs balance the outputs.\n"+
+				"The total inputs of your transaction are              %s\n"+
+				"The total outputs + ecoutputs of your transaction are %s",
+			primitives.ConvertDecimalToPaddedString(ins), primitives.ConvertDecimalToPaddedString(outs+ecs))
 
-			reportResults(ctx, msg, false)
-			return
-		}
+		fmt.Println(msg)
+		reportResults(ctx, msg, false)
+		return
 	}
 
 	transfee, err := Wallet.FactoidAddFee(trans, key, address, name)
