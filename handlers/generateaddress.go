@@ -182,8 +182,8 @@ func HandleFactoidGenerateAddressFromMnemonic(ctx *web.Context, params string) {
 func HandleVerifyAddressType(ctx *web.Context, params string) {
 	address := ctx.Params["address"]
 
-	answer, err:=HandleV2VerifyAddressType(address)
-	if err!=nil {
+	answer, err := HandleV2VerifyAddressType(address)
+	if err != nil {
 		reportResults(ctx, err.Error(), false)
 	}
 
@@ -198,7 +198,7 @@ func HandleV2VerifyAddressType(params interface{}) (interface{}, *primitives.JSO
 
 	resp, pass := Wallet.VerifyAddressType(address)
 
-	answer:=new(VerifyAddressTypeResponse)
+	answer := new(VerifyAddressTypeResponse)
 	answer.Type = resp
 	answer.Valid = pass
 	return answer, nil

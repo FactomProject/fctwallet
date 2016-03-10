@@ -1,11 +1,10 @@
 package scwallet
 
 import (
-
-	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/common/constants"
-	"github.com/FactomProject/factomd/database/databaseOverlay"
 	"github.com/FactomProject/factomd/common/factoid"
+	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/factomd/database/databaseOverlay"
 )
 
 type SCDatabaseOverlay struct {
@@ -97,11 +96,11 @@ func (sc *SCDatabaseOverlay) FetchTransaction(key []byte) (interfaces.ITransacti
 	return we.(*factoid.Transaction), nil
 }
 
-func (sc *SCDatabaseOverlay) SaveTransaction(key []byte, tx interfaces.ITransaction) (error) {
+func (sc *SCDatabaseOverlay) SaveTransaction(key []byte, tx interfaces.ITransaction) error {
 	return sc.DB.Put([]byte(constants.DB_BUILD_TRANS), key, tx)
 }
 
-func (sc *SCDatabaseOverlay) DeleteTransaction(key []byte) (error) {
+func (sc *SCDatabaseOverlay) DeleteTransaction(key []byte) error {
 	return sc.DB.Delete([]byte(constants.DB_BUILD_TRANS), key)
 }
 

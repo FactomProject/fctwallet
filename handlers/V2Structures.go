@@ -32,6 +32,6 @@ type GenerateAddressResponse struct {
 }
 
 type VerifyAddressTypeResponse struct {
-	Type string
+	Type  string
 	Valid bool
 }

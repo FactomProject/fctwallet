@@ -512,7 +512,7 @@ func HandleGetFee(ctx *web.Context, k string) {
 
 func GetAddresses() []byte {
 	values, err := Wallet.GetAddresses()
-	if err!=nil {
+	if err != nil {
 		panic(err)
 	}
 

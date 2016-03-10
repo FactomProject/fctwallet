@@ -69,7 +69,7 @@ func ComposeEntrySubmit(name string, data []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	pub := new([constants.ADDRESS_LENGTH]byte)
 	copy(pub[:], we.(interfaces.IWalletEntry).GetKey(0))
 	pri := new([constants.PRIVATE_LENGTH]byte)
