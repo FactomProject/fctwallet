@@ -12,11 +12,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/FactomProject/factomd/common/constants"
 	"github.com/FactomProject/factomd/common/factoid"
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
-	"github.com/FactomProject/fctwallet/scwallet"
 )
 
 // New Transaction:  key --
@@ -40,7 +38,7 @@ func FactoidNewTransaction(key string) error {
 	}
 
 	// Make sure we don't already have a transaction in process with this key
-	t, err := wallet.GetDB().Get([]byte(constants.DB_BUILD_TRANS), []byte(key), new(factoid.Transaction))
+	t, err := wallet.GetDB().FetchTransaction([]byte(key))
 	if err != nil {
 		return err
 	}
@@ -50,7 +48,7 @@ func FactoidNewTransaction(key string) error {
 	// Create a transaction
 	t = wallet.CreateTransaction(interfaces.GetTimeMilli())
 	// Save it with the key
-	return wallet.GetDB().Put([]byte(constants.DB_BUILD_TRANS), []byte(key), t)
+	return wallet.GetDB().SaveTransaction([]byte(key), t)
 }
 
 // Delete Transaction:  key --
@@ -63,28 +61,25 @@ func FactoidDeleteTransaction(key string) error {
 		return fmt.Errorf("Missing transaction key")
 	}
 	// Wipe out the key
-	wallet.GetDB().Delete([]byte(constants.DB_BUILD_TRANS), []byte(key))
-	return nil
+	return wallet.GetDB().DeleteTransaction([]byte(key))
 }
 
 func FactoidAddFee(trans interfaces.ITransaction, key string, address interfaces.IAddress, name string) (uint64, error) {
-	{
-		ins, err := trans.TotalInputs()
-		if err != nil {
-			return 0, err
-		}
-		outs, err := trans.TotalOutputs()
-		if err != nil {
-			return 0, err
-		}
-		ecs, err := trans.TotalECs()
-		if err != nil {
-			return 0, err
-		}
+	ins, err := trans.TotalInputs()
+	if err != nil {
+		return 0, err
+	}
+	outs, err := trans.TotalOutputs()
+	if err != nil {
+		return 0, err
+	}
+	ecs, err := trans.TotalECs()
+	if err != nil {
+		return 0, err
+	}
 
-		if ins != outs+ecs {
-			return 0, fmt.Errorf("Inputs and outputs don't add up")
-		}
+	if ins != outs+ecs {
+		return 0, fmt.Errorf("Inputs and outputs don't add up")
 	}
 
 	ok := Utility.IsValidKey(key)
@@ -117,7 +112,7 @@ func FactoidAddFee(trans interfaces.ITransaction, key string, address interfaces
 
 			// Update our map with our new transaction to the same key. Otherwise, all
 			// of our work will go away!
-			err = wallet.GetDB().Put([]byte(constants.DB_BUILD_TRANS), []byte(key), trans)
+			err = wallet.GetDB().SaveTransaction([]byte(key), trans)
 			if err != nil {
 				return 0, err
 			}
@@ -150,7 +145,7 @@ func FactoidAddInput(trans interfaces.ITransaction, key string, address interfac
 
 	// Update our map with our new transaction to the same key. Otherwise, all
 	// of our work will go away!
-	return wallet.GetDB().Put([]byte(constants.DB_BUILD_TRANS), []byte(key), trans)
+	return wallet.GetDB().SaveTransaction([]byte(key), trans)
 }
 
 func FactoidAddOutput(trans interfaces.ITransaction, key string, address interfaces.IAddress, amount uint64) error {
@@ -174,7 +169,7 @@ func FactoidAddOutput(trans interfaces.ITransaction, key string, address interfa
 
 	// Update our map with our new transaction to the same key.  Otherwise, all
 	// of our work will go away!
-	return wallet.GetDB().Put([]byte(constants.DB_BUILD_TRANS), []byte(key), trans)
+	return wallet.GetDB().SaveTransaction([]byte(key), trans)
 }
 
 func FactoidAddECOutput(trans interfaces.ITransaction, key string, address interfaces.IAddress, amount uint64) error {
@@ -197,7 +192,7 @@ func FactoidAddECOutput(trans interfaces.ITransaction, key string, address inter
 
 	// Update our map with our new transaction to the same key.  Otherwise, all
 	// of our work will go away!
-	return wallet.GetDB().Put([]byte(constants.DB_BUILD_TRANS), []byte(key), trans)
+	return wallet.GetDB().SaveTransaction([]byte(key), trans)
 }
 
 func FactoidSignTransaction(key string) error {
@@ -227,7 +222,7 @@ func FactoidSignTransaction(key string) error {
 	}
 	// Update our map with our new transaction to the same key.  Otherwise, all
 	// of our work will go away!
-	return wallet.GetDB().Put([]byte(constants.DB_BUILD_TRANS), []byte(key), trans)
+	return wallet.GetDB().SaveTransaction([]byte(key), trans)
 }
 
 func FactoidSubmit(jsonkey string) (string, error) {
@@ -296,7 +291,7 @@ func FactoidSubmit(jsonkey string) (string, error) {
 	}
 
 	if r.Success {
-		wallet.GetDB().Delete([]byte(constants.DB_BUILD_TRANS), []byte(key))
+		wallet.GetDB().DeleteTransaction([]byte(key))
 		return "", nil
 	} else {
 		return "", fmt.Errorf(r.Response)
@@ -401,29 +396,17 @@ func GetProperties() (protocol, factomd, fctwallet string, err error) {
 	return b.Protocol_Version, b.Factomd_Version, Version, nil
 }
 
-func GetAddresses() []interfaces.IWalletEntry {
-	values, err := wallet.GetDB().GetAll([]byte(constants.W_NAME), new(scwallet.WalletEntry))
-	if err != nil {
-		panic(err)
-	}
-	answerWE := []interfaces.IWalletEntry{}
-	for _, v := range values {
-		we, ok := v.(interfaces.IWalletEntry)
-		if !ok {
-			panic("Get Addresses finds the database corrupt. Shouldn't happen")
-		}
-		answerWE = append(answerWE, we)
-	}
-	return answerWE
+func GetAddresses() ([]interfaces.IWalletEntry, error) {
+	return wallet.GetDB().FetchAllWalletEntriesByName()
 }
 
 func GetTransactions() ([][]byte, []interfaces.ITransaction, error) {
 	// Get the transactions in flight.
-	keys, err := wallet.GetDB().ListAllKeys([]byte(constants.DB_BUILD_TRANS))
+	keys, err := wallet.GetDB().FetchAllTransactionKeys()
 	if err != nil {
 		return nil, nil, err
 	}
-	values, err := wallet.GetDB().GetAll([]byte(constants.DB_BUILD_TRANS), new(factoid.Transaction))
+	values, err := wallet.GetDB().FetchAllTransactions()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -440,26 +423,16 @@ func GetTransactions() ([][]byte, []interfaces.ITransaction, error) {
 			}
 		}
 	}
-	answer := []interfaces.ITransaction{}
-	theKeys := [][]byte{}
 
-	for i, _ := range values {
-		if values[i] == nil {
-			continue
-		}
-		answer = append(answer, values[i].(interfaces.ITransaction))
-		theKeys = append(theKeys, keys[i])
-	}
-
-	return theKeys, answer, nil
+	return keys, values, nil
 }
 
-func GetWalletNames() ([][]byte, []interfaces.BinaryMarshallableAndCopyable, error) {
-	keys, err := wallet.GetDB().ListAllKeys([]byte(constants.W_NAME))
+func GetWalletNames() ([][]byte, []interfaces.IWalletEntry, error) {
+	keys, err := wallet.GetDB().FetchAllAddressNameKeys()
 	if err != nil {
 		return nil, nil, err
 	}
-	values, err := wallet.GetDB().GetAll([]byte(constants.W_NAME), new(scwallet.WalletEntry))
+	values, err := wallet.GetDB().FetchAllWalletEntriesByName()
 	if err != nil {
 		return nil, nil, err
 	}

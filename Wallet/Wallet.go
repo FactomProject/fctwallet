@@ -4,11 +4,8 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/FactomProject/factomd/common/constants"
-	"github.com/FactomProject/factomd/common/factoid"
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
-	"github.com/FactomProject/fctwallet/scwallet"
 )
 
 /******************************************
@@ -39,7 +36,7 @@ func GetTransaction(key string) (trans interfaces.ITransaction, err error) {
 	// Now get the transaction.  If we don't have a transaction by the given
 	// keys there is nothing we can do.  Now we *could* create the transaaction
 	// and tie it to the key.  Something to think about.
-	ib, err := wallet.GetDB().Get([]byte(constants.DB_BUILD_TRANS), []byte(key), new(factoid.Transaction))
+	ib, err := wallet.GetDB().FetchTransaction([]byte(key))
 	if err != nil {
 		return nil, err
 	}
@@ -51,6 +48,6 @@ func GetTransaction(key string) (trans interfaces.ITransaction, err error) {
 	return
 }
 
-func GetWalletEntry(key []byte) (interfaces.BinaryMarshallable, error) {
-	return wallet.GetDB().Get([]byte(constants.W_NAME), key, new(scwallet.WalletEntry))
+func GetWalletEntry(key []byte) (interfaces.IWalletEntry, error) {
+	return wallet.GetDB().FetchWalletEntryByName(key)
 }

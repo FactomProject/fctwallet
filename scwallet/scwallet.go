@@ -21,14 +21,13 @@ import (
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/factomd/database/bytestore"
-	"github.com/FactomProject/factomd/database/databaseOverlay"
 	"github.com/FactomProject/factomd/database/hybridDB"
 )
 
 var factoshisPerEC uint64 = 100000
 
 type SCWallet struct {
-	db            interfaces.IDatabase
+	db            interfaces.ISCDatabaseOverlay
 	isInitialized bool //defaults to 0 and false
 	RootSeed      []byte
 	NextSeed      []byte
@@ -45,7 +44,7 @@ func NewSCWallet(path, filename string) *SCWallet {
 func (w *SCWallet) Init(path, filename string) {
 	os.MkdirAll(path, 0777)
 	dbase := hybridDB.NewBoltMapHybridDB(nil, path+filename)
-	w.db = databaseOverlay.NewOverlay(dbase)
+	w.db = NewSCOverlay(dbase)
 }
 
 /*************************************
@@ -64,7 +63,7 @@ func (w *SCWallet) SetRoot(root []byte) {
 	w.RootSeed = root
 }
 
-func (w *SCWallet) GetDB() interfaces.IDatabase {
+func (w *SCWallet) GetDB() interfaces.ISCDatabaseOverlay {
 	return w.db
 }
 

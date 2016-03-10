@@ -130,8 +130,8 @@ func getParams_(ctx *web.Context, params string, ec bool) (
 			return
 		}
 		if we != nil {
-			address, err = we.(interfaces.IWalletEntry).GetAddress()
-			if we.(interfaces.IWalletEntry).GetType() == "ec" {
+			address, err = we.GetAddress()
+			if we.GetType() == "ec" {
 				if !ec {
 					reportResults(ctx, "Was Expecting a Factoid Address", false)
 					ok = false
@@ -511,7 +511,10 @@ func HandleGetFee(ctx *web.Context, k string) {
 }
 
 func GetAddresses() []byte {
-	values := Wallet.GetAddresses()
+	values, err := Wallet.GetAddresses()
+	if err!=nil {
+		panic(err)
+	}
 
 	ecKeys := make([]string, 0, len(values))
 	fctKeys := make([]string, 0, len(values))
