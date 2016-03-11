@@ -220,6 +220,12 @@ func FactoidSignTransaction(key string) error {
 	if err != nil {
 		return err
 	}
+
+	err = wallet.ValidateSignatures(trans)
+	if err != nil {
+		fmt.Printf("FactoidSignTransaction - Signature invalid - %v, %v\n", trans, err)
+		return err
+	}
 	// Update our map with our new transaction to the same key.  Otherwise, all
 	// of our work will go away!
 	return wallet.GetDB().SaveTransaction([]byte(key), trans)
@@ -240,8 +246,11 @@ func FactoidSubmit(jsonkey string) (string, error) {
 		return "", err
 	}
 
+	fmt.Printf("Fetched transaction - %v\n", trans)
+
 	err = wallet.ValidateSignatures(trans)
 	if err != nil {
+		fmt.Printf("Signature invalid - %v\n", err)
 		fmt.Println(err)
 		return "", err
 	}
@@ -255,6 +264,7 @@ func FactoidSubmit(jsonkey string) (string, error) {
 	// Okay, transaction is good, so marshal and send to factomd!
 	data, err := trans.MarshalBinary()
 	if err != nil {
+		fmt.Printf("Error marshalling transaction - %v\n", err)
 		fmt.Println(err)
 		return "", err
 	}
@@ -268,6 +278,8 @@ func FactoidSubmit(jsonkey string) (string, error) {
 		fmt.Println(err)
 		return "", err
 	}
+
+	fmt.Printf("Encoded transaction - %v\n", j)
 
 	resp, err := http.Post(
 		fmt.Sprintf("http://%s:%d/v1/factoid-submit/", ipaddressFD, portNumberFD),
@@ -352,8 +364,6 @@ func GetFee() (int64, error) {
 		return 0, err
 	}
 	resp.Body.Close()
-
-	fmt.Println("GetFee", string(body))
 
 	type x struct {
 		Response struct {

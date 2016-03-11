@@ -83,6 +83,18 @@ func (sc *SCDatabaseOverlay) FetchAllAddressPublicKeys() ([][]byte, error) {
 	return sc.DB.ListAllKeys([]byte(constants.W_ADDRESS_PUB_KEY))
 }
 
+func (sc *SCDatabaseOverlay) SaveRCDAddress(key []byte, we interfaces.IWalletEntry) error {
+	return sc.DB.Put([]byte(constants.W_RCD_ADDRESS_HASH), key, we)
+}
+
+func (sc *SCDatabaseOverlay) SaveAddressByPublicKey(key []byte, we interfaces.IWalletEntry) error {
+	return sc.DB.Put([]byte(constants.W_ADDRESS_PUB_KEY), key, we)
+}
+
+func (sc *SCDatabaseOverlay) SaveAddressByName(key []byte, we interfaces.IWalletEntry) error {
+	return sc.DB.Put([]byte(constants.W_NAME), key, we)
+}
+
 //Transactions
 
 func (sc *SCDatabaseOverlay) FetchTransaction(key []byte) (interfaces.ITransaction, error) {

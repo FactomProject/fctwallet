@@ -27,7 +27,7 @@ func ValidateKey(key string) error {
 	return fmt.Errorf("Invalid key")
 }
 
-func GetTransaction(key string) (trans interfaces.ITransaction, err error) {
+func GetTransaction(key string) (interfaces.ITransaction, error) {
 	ok := Utility.IsValidKey(key)
 	if !ok {
 		return nil, fmt.Errorf("Invalid name or address")
@@ -36,16 +36,7 @@ func GetTransaction(key string) (trans interfaces.ITransaction, err error) {
 	// Now get the transaction.  If we don't have a transaction by the given
 	// keys there is nothing we can do.  Now we *could* create the transaaction
 	// and tie it to the key.  Something to think about.
-	ib, err := wallet.GetDB().FetchTransaction([]byte(key))
-	if err != nil {
-		return nil, err
-	}
-
-	trans, ok = ib.(interfaces.ITransaction)
-	if ib == nil || !ok {
-		return nil, fmt.Errorf("Unknown Transaction: %s", key)
-	}
-	return
+	return wallet.GetDB().FetchTransaction([]byte(key))
 }
 
 func GetWalletEntry(key []byte) (interfaces.IWalletEntry, error) {

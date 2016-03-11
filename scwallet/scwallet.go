@@ -68,7 +68,6 @@ func (w *SCWallet) GetDB() interfaces.ISCDatabaseOverlay {
 }
 
 func (w *SCWallet) SignInputs(trans interfaces.ITransaction) (bool, error) {
-
 	data, err := trans.MarshalBinarySig() // Get the part of the transaction we sign
 	if err != nil {
 		return false, err
@@ -82,11 +81,10 @@ func (w *SCWallet) SignInputs(trans interfaces.ITransaction) (bool, error) {
 		rcd1, ok := rcd.(*RCD_1)
 		if ok {
 			pub := rcd1.GetPublicKey()
-			wex, err := w.db.Get([]byte(constants.W_ADDRESS_PUB_KEY), pub, new(WalletEntry))
+			we, err := w.db.FetchWalletEntryByPublicKey(pub)
 			if err != nil {
 				return false, err
 			}
-			we := wex.(*WalletEntry)
 			if we != nil {
 				var pri [constants.SIGNATURE_LENGTH]byte
 				copy(pri[:], we.private[0])
@@ -156,10 +154,9 @@ func (w *SCWallet) generateAddress(addrtype string, name []byte, m int, n int) (
 }
 
 func (w *SCWallet) AddKeyPair(addrtype string, name []byte, pub []byte, pri []byte, generateRandomIfAddressPresent bool) (address interfaces.IAddress, err error) {
-
 	we := new(WalletEntry)
 
-	nm, err := w.db.Get([]byte(constants.W_NAME), name, new(WalletEntry))
+	nm, err := w.db.FetchWalletEntryByName(name)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +168,7 @@ func (w *SCWallet) AddKeyPair(addrtype string, name []byte, pub []byte, pri []by
 	// Make sure we have not generated this pair before;  Keep
 	// generating until we have a unique pair.
 	for {
-		p, err := w.db.Get([]byte(constants.W_ADDRESS_PUB_KEY), pub, new(WalletEntry))
+		p, err := w.db.FetchWalletEntryByPublicKey(pub)
 		if p == nil {
 			break
 		}
@@ -195,15 +192,15 @@ func (w *SCWallet) AddKeyPair(addrtype string, name []byte, pub []byte, pri []by
 	}
 	//
 	address, _ = we.GetAddress()
-	err = w.db.Put([]byte(constants.W_RCD_ADDRESS_HASH), address.Bytes(), we)
+	err = w.db.SaveRCDAddress(address.Bytes(), we)
 	if err != nil {
 		return nil, err
 	}
-	err = w.db.Put([]byte(constants.W_ADDRESS_PUB_KEY), pub, we)
+	err = w.db.SaveAddressByPublicKey(pub, we)
 	if err != nil {
 		return nil, err
 	}
-	err = w.db.Put([]byte(constants.W_NAME), name, we)
+	err = w.db.SaveAddressByName(name, we)
 	if err != nil {
 		return nil, err
 	}
