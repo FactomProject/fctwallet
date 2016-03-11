@@ -86,14 +86,8 @@ func (w *SCWallet) SignInputs(trans interfaces.ITransaction) (bool, error) {
 				return false, err
 			}
 			if we != nil {
-				var pri [constants.SIGNATURE_LENGTH]byte
-				copy(pri[:], we.private[0])
-				bsig := ed25519.Sign(&pri, data)
-				sig := new(FactoidSignature)
-				sig.SetSignature(bsig[:])
-				sigblk := new(SignatureBlock)
-				sigblk.AddSignature(sig)
-				trans.SetSignatureBlock(i, sigblk)
+				sig := NewSingleSignatureBlock(we.GetPrivKey(0), data)
+				trans.SetSignatureBlock(i, sig)
 				numSigs += 1
 			}
 		}
