@@ -143,16 +143,14 @@ func HandleResolveAddress(ctx *web.Context, adr string) {
 		return
 	}
 
-	var str string
 	t := new(x)
 	t.Fct = f
 	t.Ec = e
-	if p, err := json.Marshal(t); err != nil {
+	p, err := json.Marshal(t)
+	if err != nil {
 		reportResults(ctx, err.Error(), false)
 		return
-	} else {
-		str = string(p)
 	}
-		
-	reportResults(ctx, str, true)
+
+	reportResults(ctx, string(p), true)
 }
