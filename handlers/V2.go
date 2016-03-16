@@ -121,13 +121,13 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 	case "entry-credit-balance":
 		resp, jsonError = HandleV2EntryCreditBalance(params)
 		break
-		/*case "factoid-generate-address":
+		case "factoid-generate-address":
 			resp, jsonError = HandleV2FactoidGenerateAddress(params)
 			break
 		case "factoid-generate-ec-address":
 			resp, jsonError = HandleV2FactoidGenerateECAddress(params)
 			break
-		case "factoid-generate-address-from-private-key":
+		/*case "factoid-generate-address-from-private-key":
 			resp, jsonError = HandleV2FactoidGenerateAddressFromPrivateKey(params)
 			break
 		case "factoid-generate-ec-address-from-private-key":

@@ -34,33 +34,40 @@ func HandleV2FactoidGenerateAddress(params interface{}) (interface{}, *primitive
 }
 
 func HandleFactoidGenerateAddress(ctx *web.Context, name string) {
-	if Utility.IsValidKey(name) == false {
-		reportResults(ctx, "Name provided is not valid", false)
-		return
-	}
-
-	adrstr, err := Wallet.GenerateAddressString(name)
+	answer, err := HandleV2FactoidGenerateAddress(name)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
-		return
 	}
-
-	reportResults(ctx, adrstr, true)
+	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
 
-func HandleFactoidGenerateECAddress(ctx *web.Context, name string) {
+func HandleV2FactoidGenerateECAddress(params interface{}) (interface{}, *primitives.JSONError)  {
+	name, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
 	if Utility.IsValidKey(name) == false {
-		reportResults(ctx, "Name provided is not valid", false)
-		return
+		return nil, NewInvalidNameError()
 	}
 
 	adrstr, err := Wallet.GenerateECAddressString(name)
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, adrstr, true)
+	resp := new(GenerateAddressResponse)
+	resp.Address = adrstr
+
+	return resp, nil
+}
+
+func HandleFactoidGenerateECAddress(ctx *web.Context, name string) {
+	answer, err := HandleV2FactoidGenerateECAddress(name)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+	}
+	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
 
 /*********************************************************************************************************/
