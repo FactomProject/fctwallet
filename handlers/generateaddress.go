@@ -77,51 +77,91 @@ func HandleFactoidGenerateECAddress(ctx *web.Context, name string) {
 func HandleFactoidGenerateAddressFromPrivateKey(ctx *web.Context, params string) {
 	name := ctx.Params["name"]
 	privateKey := ctx.Params["privateKey"]
+
+	req:=new(GenerateAddressFromPrivateKeyRequest)
+	req.Name = name
+	req.PrivateKey = privateKey
+
+	answer, err := HandleV2FactoidGenerateAddressFromPrivateKey(req)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+	}
+
+	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
+}
+
+func HandleV2FactoidGenerateAddressFromPrivateKey(params interface{}) (interface{}, *primitives.JSONError)  {
+	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	name := priv.Name
+	privateKey := priv.PrivateKey
 	if Utility.IsValidKey(name) == false {
-		reportResults(ctx, "Name provided is not valid", false)
-		return
+		return nil, NewInvalidNameError()
 	}
 	if len(privateKey) != 64 && len(privateKey) != 128 {
-		reportResults(ctx, "Invalid private key length", false)
-		return
+		return nil, wsapi.NewInvalidParamsError()
 	}
 	if Utility.IsValidHex(privateKey) == false {
-		reportResults(ctx, "Invalid private key format", false)
-		return
+		return nil, wsapi.NewInvalidParamsError()
 	}
 
 	adrstr, err := Wallet.GenerateAddressStringFromPrivateKey(name, privateKey)
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, adrstr, true)
+	resp := new(GenerateAddressResponse)
+	resp.Address = adrstr
+
+	return resp, nil
 }
 
 func HandleFactoidGenerateECAddressFromPrivateKey(ctx *web.Context, params string) {
 	name := ctx.Params["name"]
 	privateKey := ctx.Params["privateKey"]
+
+	req:=new(GenerateAddressFromPrivateKeyRequest)
+	req.Name = name
+	req.PrivateKey = privateKey
+
+	answer, err := HandleV2FactoidGenerateECAddressFromPrivateKey(req)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+	}
+
+	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
+}
+
+func HandleV2FactoidGenerateECAddressFromPrivateKey(params interface{}) (interface{}, *primitives.JSONError)  {
+	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	name := priv.Name
+	privateKey := priv.PrivateKey
 	if Utility.IsValidKey(name) == false {
-		reportResults(ctx, "Name provided is not valid", false)
-		return
+		return nil, NewInvalidNameError()
 	}
 	if len(privateKey) != 64 && len(privateKey) != 128 {
-		reportResults(ctx, "Invalid private key length", false)
-		return
+		return nil, wsapi.NewInvalidParamsError()
 	}
 	if Utility.IsValidHex(privateKey) == false {
-		reportResults(ctx, "Invalid private key format", false)
-		return
+		return nil, wsapi.NewInvalidParamsError()
 	}
 
 	adrstr, err := Wallet.GenerateECAddressStringFromPrivateKey(name, privateKey)
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, adrstr, true)
+	resp := new(GenerateAddressResponse)
+	resp.Address = adrstr
+
+	return resp, nil
 }
 
 /*********************************************************************************************************/

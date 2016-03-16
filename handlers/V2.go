@@ -127,13 +127,13 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 		case "factoid-generate-ec-address":
 			resp, jsonError = HandleV2FactoidGenerateECAddress(params)
 			break
-		/*case "factoid-generate-address-from-private-key":
+		case "factoid-generate-address-from-private-key":
 			resp, jsonError = HandleV2FactoidGenerateAddressFromPrivateKey(params)
 			break
 		case "factoid-generate-ec-address-from-private-key":
 			resp, jsonError = HandleV2FactoidGenerateECAddressFromPrivateKey(params)
 			break
-		case "factoid-generate-address-from-human-readable-private-key":
+		/*case "factoid-generate-address-from-human-readable-private-key":
 			resp, jsonError = HandleV2FactoidGenerateAddressFromHumanReadablePrivateKey(params)
 			break
 		case "factoid-generate-ec-address-from-human-readable-private-key":

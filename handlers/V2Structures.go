@@ -35,3 +35,8 @@ type VerifyAddressTypeResponse struct {
 	Type  string
 	Valid bool
 }
+
+type GenerateAddressFromPrivateKeyRequest struct {
+	Name string `json:"name"`
+	PrivateKey string `json:"privateKey"`
+}

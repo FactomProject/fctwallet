@@ -130,19 +130,6 @@ func HandleEntryCreditBalance(ctx *web.Context, adr string) {
 	reportResults(ctx, str, true)
 }
 
-func HandleFactoidBalance(ctx *web.Context, adr string) {
-	req := primitives.NewJSON2Request(1, adr, "factoid-balance")
-
-	jsonResp, jsonError := HandleV2GetRequest(req)
-	if jsonError != nil {
-		reportResults(ctx, jsonError.Message, false)
-		return
-	}
-
-	str := fmt.Sprintf("%d", jsonResp.Result.(*FactoidBalanceResponse).Balance)
-	reportResults(ctx, str, true)
-}
-
 func HandleV2EntryCreditBalance(params interface{}) (interface{}, *primitives.JSONError) {
 	adr, ok := params.(string)
 	if ok == false {
@@ -157,6 +144,19 @@ func HandleV2EntryCreditBalance(params interface{}) (interface{}, *primitives.JS
 	resp.Balance = v
 
 	return resp, nil
+}
+
+func HandleFactoidBalance(ctx *web.Context, adr string) {
+	req := primitives.NewJSON2Request(1, adr, "factoid-balance")
+
+	jsonResp, jsonError := HandleV2GetRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
+		return
+	}
+
+	str := fmt.Sprintf("%d", jsonResp.Result.(*FactoidBalanceResponse).Balance)
+	reportResults(ctx, str, true)
 }
 
 func HandleV2FactoidBalance(params interface{}) (interface{}, *primitives.JSONError) {
