@@ -121,30 +121,30 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 	case "entry-credit-balance":
 		resp, jsonError = HandleV2EntryCreditBalance(params)
 		break
-		case "factoid-generate-address":
-			resp, jsonError = HandleV2FactoidGenerateAddress(params)
-			break
-		case "factoid-generate-ec-address":
-			resp, jsonError = HandleV2FactoidGenerateECAddress(params)
-			break
-		case "factoid-generate-address-from-private-key":
-			resp, jsonError = HandleV2FactoidGenerateAddressFromPrivateKey(params)
-			break
-		case "factoid-generate-ec-address-from-private-key":
-			resp, jsonError = HandleV2FactoidGenerateECAddressFromPrivateKey(params)
-			break
-		case "factoid-generate-address-from-human-readable-private-key":
-			resp, jsonError = HandleV2FactoidGenerateAddressFromHumanReadablePrivateKey(params)
-			break
-		case "factoid-generate-ec-address-from-human-readable-private-key":
-			resp, jsonError = HandleV2FactoidGenerateECAddressFromHumanReadablePrivateKey(params)
-			break
-		case "factoid-generate-address-from-token-sale":
-			resp, jsonError = HandleV2FactoidGenerateAddressFromMnemonic(params)
-			break
-		case "verify-address-type":
-			resp, jsonError = HandleV2VerifyAddressType(params)
-			break
+	case "factoid-generate-address":
+		resp, jsonError = HandleV2FactoidGenerateAddress(params)
+		break
+	case "factoid-generate-ec-address":
+		resp, jsonError = HandleV2FactoidGenerateECAddress(params)
+		break
+	case "factoid-generate-address-from-private-key":
+		resp, jsonError = HandleV2FactoidGenerateAddressFromPrivateKey(params)
+		break
+	case "factoid-generate-ec-address-from-private-key":
+		resp, jsonError = HandleV2FactoidGenerateECAddressFromPrivateKey(params)
+		break
+	case "factoid-generate-address-from-human-readable-private-key":
+		resp, jsonError = HandleV2FactoidGenerateAddressFromHumanReadablePrivateKey(params)
+		break
+	case "factoid-generate-ec-address-from-human-readable-private-key":
+		resp, jsonError = HandleV2FactoidGenerateECAddressFromHumanReadablePrivateKey(params)
+		break
+	case "factoid-generate-address-from-token-sale":
+		resp, jsonError = HandleV2FactoidGenerateAddressFromMnemonic(params)
+		break
+	case "verify-address-type":
+		resp, jsonError = HandleV2VerifyAddressType(params)
+		break
 		/*case "factoid-validate":
 			resp, jsonError = HandleV2FactoidValidate(params)
 			break

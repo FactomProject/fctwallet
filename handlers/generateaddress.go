@@ -12,6 +12,14 @@ import (
 	"github.com/FactomProject/web"
 )
 
+func HandleFactoidGenerateAddress(ctx *web.Context, name string) {
+	answer, err := HandleV2FactoidGenerateAddress(name)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+	}
+	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
+}
+
 func HandleV2FactoidGenerateAddress(params interface{}) (interface{}, *primitives.JSONError) {
 	name, ok := params.(string)
 	if ok == false {
@@ -33,15 +41,15 @@ func HandleV2FactoidGenerateAddress(params interface{}) (interface{}, *primitive
 	return resp, nil
 }
 
-func HandleFactoidGenerateAddress(ctx *web.Context, name string) {
-	answer, err := HandleV2FactoidGenerateAddress(name)
+func HandleFactoidGenerateECAddress(ctx *web.Context, name string) {
+	answer, err := HandleV2FactoidGenerateECAddress(name)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
 	}
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
 
-func HandleV2FactoidGenerateECAddress(params interface{}) (interface{}, *primitives.JSONError)  {
+func HandleV2FactoidGenerateECAddress(params interface{}) (interface{}, *primitives.JSONError) {
 	name, ok := params.(string)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
@@ -62,14 +70,6 @@ func HandleV2FactoidGenerateECAddress(params interface{}) (interface{}, *primiti
 	return resp, nil
 }
 
-func HandleFactoidGenerateECAddress(ctx *web.Context, name string) {
-	answer, err := HandleV2FactoidGenerateECAddress(name)
-	if err != nil {
-		reportResults(ctx, err.Error(), false)
-	}
-	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
-}
-
 /*********************************************************************************************************/
 /******************************************From Private Key***********************************************/
 /*********************************************************************************************************/
@@ -78,7 +78,7 @@ func HandleFactoidGenerateAddressFromPrivateKey(ctx *web.Context, params string)
 	name := ctx.Params["name"]
 	privateKey := ctx.Params["privateKey"]
 
-	req:=new(GenerateAddressFromPrivateKeyRequest)
+	req := new(GenerateAddressFromPrivateKeyRequest)
 	req.Name = name
 	req.PrivateKey = privateKey
 
@@ -90,7 +90,7 @@ func HandleFactoidGenerateAddressFromPrivateKey(ctx *web.Context, params string)
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
 
-func HandleV2FactoidGenerateAddressFromPrivateKey(params interface{}) (interface{}, *primitives.JSONError)  {
+func HandleV2FactoidGenerateAddressFromPrivateKey(params interface{}) (interface{}, *primitives.JSONError) {
 	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
@@ -123,7 +123,7 @@ func HandleFactoidGenerateECAddressFromPrivateKey(ctx *web.Context, params strin
 	name := ctx.Params["name"]
 	privateKey := ctx.Params["privateKey"]
 
-	req:=new(GenerateAddressFromPrivateKeyRequest)
+	req := new(GenerateAddressFromPrivateKeyRequest)
 	req.Name = name
 	req.PrivateKey = privateKey
 
@@ -135,7 +135,7 @@ func HandleFactoidGenerateECAddressFromPrivateKey(ctx *web.Context, params strin
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
 
-func HandleV2FactoidGenerateECAddressFromPrivateKey(params interface{}) (interface{}, *primitives.JSONError)  {
+func HandleV2FactoidGenerateECAddressFromPrivateKey(params interface{}) (interface{}, *primitives.JSONError) {
 	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
@@ -172,7 +172,7 @@ func HandleFactoidGenerateAddressFromHumanReadablePrivateKey(ctx *web.Context, p
 	name := ctx.Params["name"]
 	privateKey := ctx.Params["privateKey"]
 
-	req:=new(GenerateAddressFromPrivateKeyRequest)
+	req := new(GenerateAddressFromPrivateKeyRequest)
 	req.Name = name
 	req.PrivateKey = privateKey
 
@@ -184,7 +184,7 @@ func HandleFactoidGenerateAddressFromHumanReadablePrivateKey(ctx *web.Context, p
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
 
-func HandleV2FactoidGenerateAddressFromHumanReadablePrivateKey(params interface{}) (interface{}, *primitives.JSONError)  {
+func HandleV2FactoidGenerateAddressFromHumanReadablePrivateKey(params interface{}) (interface{}, *primitives.JSONError) {
 	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
@@ -211,7 +211,7 @@ func HandleFactoidGenerateECAddressFromHumanReadablePrivateKey(ctx *web.Context,
 	name := ctx.Params["name"]
 	privateKey := ctx.Params["privateKey"]
 
-	req:=new(GenerateAddressFromPrivateKeyRequest)
+	req := new(GenerateAddressFromPrivateKeyRequest)
 	req.Name = name
 	req.PrivateKey = privateKey
 
@@ -223,7 +223,7 @@ func HandleFactoidGenerateECAddressFromHumanReadablePrivateKey(ctx *web.Context,
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
 
-func HandleV2FactoidGenerateECAddressFromHumanReadablePrivateKey(params interface{}) (interface{}, *primitives.JSONError)  {
+func HandleV2FactoidGenerateECAddressFromHumanReadablePrivateKey(params interface{}) (interface{}, *primitives.JSONError) {
 	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
@@ -254,7 +254,7 @@ func HandleFactoidGenerateAddressFromMnemonic(ctx *web.Context, params string) {
 	name := ctx.Params["name"]
 	mnemonic := ctx.Params["mnemonic"]
 
-	req:=new(GenerateAddressFromPrivateKeyRequest)
+	req := new(GenerateAddressFromPrivateKeyRequest)
 	req.Name = name
 	req.Mnemonic = mnemonic
 
@@ -266,7 +266,7 @@ func HandleFactoidGenerateAddressFromMnemonic(ctx *web.Context, params string) {
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
 
-func HandleV2FactoidGenerateAddressFromMnemonic(params interface{}) (interface{}, *primitives.JSONError)  {
+func HandleV2FactoidGenerateAddressFromMnemonic(params interface{}) (interface{}, *primitives.JSONError) {
 	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
