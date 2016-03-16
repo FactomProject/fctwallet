@@ -38,5 +38,6 @@ type VerifyAddressTypeResponse struct {
 
 type GenerateAddressFromPrivateKeyRequest struct {
 	Name string `json:"name"`
-	PrivateKey string `json:"privateKey"`
+	PrivateKey string `json:"privateKey,omitempty"`
+	Mnemonic string `json:"mnemonic,omitempty"`
 }

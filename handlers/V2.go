@@ -133,7 +133,7 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 		case "factoid-generate-ec-address-from-private-key":
 			resp, jsonError = HandleV2FactoidGenerateECAddressFromPrivateKey(params)
 			break
-		/*case "factoid-generate-address-from-human-readable-private-key":
+		case "factoid-generate-address-from-human-readable-private-key":
 			resp, jsonError = HandleV2FactoidGenerateAddressFromHumanReadablePrivateKey(params)
 			break
 		case "factoid-generate-ec-address-from-human-readable-private-key":
@@ -145,7 +145,7 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 		case "verify-address-type":
 			resp, jsonError = HandleV2VerifyAddressType(params)
 			break
-		case "factoid-validate":
+		/*case "factoid-validate":
 			resp, jsonError = HandleV2FactoidValidate(params)
 			break
 		case "factoid-get-fee":

@@ -171,35 +171,79 @@ func HandleV2FactoidGenerateECAddressFromPrivateKey(params interface{}) (interfa
 func HandleFactoidGenerateAddressFromHumanReadablePrivateKey(ctx *web.Context, params string) {
 	name := ctx.Params["name"]
 	privateKey := ctx.Params["privateKey"]
+
+	req:=new(GenerateAddressFromPrivateKeyRequest)
+	req.Name = name
+	req.PrivateKey = privateKey
+
+	answer, err := HandleV2FactoidGenerateAddressFromHumanReadablePrivateKey(req)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+	}
+
+	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
+}
+
+func HandleV2FactoidGenerateAddressFromHumanReadablePrivateKey(params interface{}) (interface{}, *primitives.JSONError)  {
+	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	name := priv.Name
+	privateKey := priv.PrivateKey
 	if Utility.IsValidKey(name) == false {
-		reportResults(ctx, "Name provided is not valid", false)
-		return
+		return nil, NewInvalidNameError()
 	}
 
 	adrstr, err := Wallet.GenerateAddressStringFromHumanReadablePrivateKey(name, privateKey)
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, adrstr, true)
+	resp := new(GenerateAddressResponse)
+	resp.Address = adrstr
+
+	return resp, nil
 }
 
 func HandleFactoidGenerateECAddressFromHumanReadablePrivateKey(ctx *web.Context, params string) {
 	name := ctx.Params["name"]
 	privateKey := ctx.Params["privateKey"]
+
+	req:=new(GenerateAddressFromPrivateKeyRequest)
+	req.Name = name
+	req.PrivateKey = privateKey
+
+	answer, err := HandleV2FactoidGenerateECAddressFromHumanReadablePrivateKey(req)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+	}
+
+	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
+}
+
+func HandleV2FactoidGenerateECAddressFromHumanReadablePrivateKey(params interface{}) (interface{}, *primitives.JSONError)  {
+	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	name := priv.Name
+	privateKey := priv.PrivateKey
 	if Utility.IsValidKey(name) == false {
-		reportResults(ctx, "Name provided is not valid", false)
-		return
+		return nil, NewInvalidNameError()
 	}
 
 	adrstr, err := Wallet.GenerateECAddressStringFromHumanReadablePrivateKey(name, privateKey)
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, adrstr, true)
+	resp := new(GenerateAddressResponse)
+	resp.Address = adrstr
+
+	return resp, nil
 }
 
 /*********************************************************************************************************/
@@ -209,18 +253,40 @@ func HandleFactoidGenerateECAddressFromHumanReadablePrivateKey(ctx *web.Context,
 func HandleFactoidGenerateAddressFromMnemonic(ctx *web.Context, params string) {
 	name := ctx.Params["name"]
 	mnemonic := ctx.Params["mnemonic"]
+
+	req:=new(GenerateAddressFromPrivateKeyRequest)
+	req.Name = name
+	req.Mnemonic = mnemonic
+
+	answer, err := HandleV2FactoidGenerateAddressFromMnemonic(req)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+	}
+
+	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
+}
+
+func HandleV2FactoidGenerateAddressFromMnemonic(params interface{}) (interface{}, *primitives.JSONError)  {
+	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	name := priv.Name
+	mnemonic := priv.Mnemonic
 	if Utility.IsValidKey(name) == false {
-		reportResults(ctx, "Name provided is not valid", false)
-		return
+		return nil, NewInvalidNameError()
 	}
 
 	adrstr, err := Wallet.GenerateAddressStringFromMnemonic(name, mnemonic)
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, adrstr, true)
+	resp := new(GenerateAddressResponse)
+	resp.Address = adrstr
+
+	return resp, nil
 }
 
 /*********************************************************************************************************/
