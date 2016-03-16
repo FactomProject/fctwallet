@@ -212,9 +212,21 @@ func HandleGetProcessedTransactions(ctx*web.Context, parms string) {
 func HandleGetProcessedTransactionsj(ctx*web.Context, parms string) {
 	cmd := ctx.Params["cmd"]
 	adr := ctx.Params["address"]
+	sstart := ctx.Params["start"]
+	send := ctx.Params["end"]
+	
+	if len(sstart) == 0 { sstart = "0"}
+	if len(send) == 0 { send = "0"}
+	
+	start, err1 := strconv.ParseInt(sstart, 10, 32)
+	end, err2 := strconv.ParseInt(send, 10, 32)
+	if err1 != nil || err2 != nil {
+		start = 0
+		end = 1000000000
+	}
 	
 	if cmd == "all" {
-		list, err := Utility.DumpTransactionsJSON(nil)
+		list, err := Utility.DumpTransactionsJSON(nil,int(start),int(end))
 		if err != nil {
 			reportResults(ctx,err.Error(),false)
 			return
@@ -235,7 +247,7 @@ func HandleGetProcessedTransactionsj(ctx*web.Context, parms string) {
 		var adrs [][]byte
 		adrs = append(adrs,badr)
 		
-		list, err := Utility.DumpTransactionsJSON(adrs)
+		list, err := Utility.DumpTransactionsJSON(adrs,int(start),int(end))
 		if err != nil {
 			reportResults(ctx,err.Error(),false)
 			return
