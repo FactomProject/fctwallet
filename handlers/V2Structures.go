@@ -25,6 +25,17 @@ type FactoidBalanceResponse struct {
 	Balance int64
 }
 
+//Commit
+
+type CommitRequest struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
+}
+
+type CommitResponse struct {
+	Success string
+}
+
 //Generateaddress
 
 type GenerateAddressResponse struct {

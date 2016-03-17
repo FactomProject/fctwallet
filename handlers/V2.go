@@ -80,14 +80,14 @@ func HandleV2PostRequest(j *primitives.JSON2Request) (*primitives.JSON2Response,
 			break
 		case "factoid-sign-transaction":
 			resp, jsonError = HandleV2FactoidSignTransaction(params)
-			break
+			break*/
 		case "commit-chain":
 			resp, jsonError = HandleV2CommitChain(params)
 			break
 		case "commit-entry":
 			resp, jsonError = HandleV2CommitEntry(params)
 			break
-		case "factoid-submit":
+		/*case "factoid-submit":
 			resp, jsonError = HandleV2FactoidSubmit(params)
 			break
 		case "factoid-get-processed-transactions":
