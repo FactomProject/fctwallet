@@ -15,7 +15,6 @@ import (
 	fct "github.com/FactomProject/factoid"
 	"github.com/FactomProject/factoid/wallet"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
-	netki "github.com/netkicorp/go-partner-client"
 )
 
 func CommitChain(name string, data []byte) error {
@@ -44,9 +43,6 @@ func CommitChain(name string, data []byte) error {
 		if err == nil {
 			we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
 		}
-	} else if adr, err := netki.WalletNameLookup(name, "fec"); err != nil {
-		addr := fct.ConvertUserStrToAddress(adr)
-		we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
 	} else {
 		we = factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(name))
 	}
@@ -108,9 +104,6 @@ func CommitEntry(name string, data []byte) error {
 		if err == nil {
 			we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
 		}
-	} else if adr, err := netki.WalletNameLookup(name, "fec"); err != nil {
-		addr := fct.ConvertUserStrToAddress(adr)
-		we = factoidState.GetDB().GetRaw([]byte(fct.W_ADDRESS_PUB_KEY), addr)
 	} else {
 		we = factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(name))
 	}
