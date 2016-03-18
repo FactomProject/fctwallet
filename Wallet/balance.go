@@ -8,44 +8,43 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	fct "github.com/FactomProject/factoid"
-	"github.com/FactomProject/factoid/wallet"
-	"github.com/FactomProject/fctwallet/Wallet/Utility"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+
+	fct "github.com/FactomProject/factoid"
+	"github.com/FactomProject/factoid/wallet"
+	"github.com/FactomProject/fctwallet/Wallet/Utility"
 )
 
 func LookupAddress(adrType string, adr string) (string, error) {
-	if Utility.IsValidAddress(adr) && strings.HasPrefix(adr,adrType) {
+	if Utility.IsValidAddress(adr) && strings.HasPrefix(adr, adrType) {
 		baddr := fct.ConvertUserStrToAddress(adr)
 		adr = hex.EncodeToString(baddr)
 	} else if Utility.IsValidHexAddress(adr) {
 		// the address is good enough.
 	} else if Utility.IsValidNickname(adr) {
 		we := factoidState.GetDB().GetRaw([]byte(fct.W_NAME), []byte(adr))
-		
+
 		if we != nil {
 			we2 := we.(wallet.IWalletEntry)
-			
-            if we2.GetType() == "ec" {
-                if strings.ToLower(adrType) == "fa" {
-                    return "", fmt.Errorf("%s is an entry credit address, not a factoid address.",adr)
-                } 
-            } else if we2.GetType() == "fct" {
-                if strings.ToLower(adrType) == "ec" {
-                    return "", fmt.Errorf("%s is a factoid address, not an entry credit address.",adr)
-                }
-            }
-			
+
+			if we2.GetType() == "ec" {
+				if strings.ToLower(adrType) == "fa" {
+					return "", fmt.Errorf("%s is an entry credit address, not a factoid address.", adr)
+				}
+			} else if we2.GetType() == "fct" {
+				if strings.ToLower(adrType) == "ec" {
+					return "", fmt.Errorf("%s is a factoid address, not an entry credit address.", adr)
+				}
+			}
+
 			addr, _ := we2.GetAddress()
 			adr = hex.EncodeToString(addr.Bytes())
 		} else {
-			return "", fmt.Errorf("Name %s is undefined.",adr)
+			return "", fmt.Errorf("Name %s is undefined.", adr)
 		}
-	} else {
-		return "", fmt.Errorf("Invalid Name.  Check that you have entered the name correctly.")
 	}
 	
 	return adr, nil

@@ -52,6 +52,10 @@ func Start() {
 
 	server.Get("/v1/factoid-generate-address-from-token-sale/(.*)", handlers.HandleFactoidGenerateAddressFromMnemonic)
 
+	// resolve-address does a DNS lookup of an address on netki and returns a
+	// human readable factoid and/or entry credit address
+	server.Get("/v1/resolve-address/(.*)", handlers.HandleResolveAddress)
+
 	// verify-address-type
 	// localhost:8089/v1/verify-address-type/address=<address>
 	// take address and define its type or fail if not valid address
