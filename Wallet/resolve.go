@@ -6,7 +6,7 @@ package Wallet
 
 import (
 	"fmt"
-	netki "github.com/netkicorp/go-partner-client"
+	netki "github.com/FactomProject/netki-go-partner-client"
 )
 
 func NetkiResolve(adr string) (string, string, error) {
