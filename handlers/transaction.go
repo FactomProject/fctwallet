@@ -415,6 +415,53 @@ func HandleFactoidAddFee(ctx *web.Context, parms string) {
 	return
 }
 
+func HandleFactoidSubFee(ctx *web.Context, parms string) {
+	trans, key, _, address, _, ok := getParams_(ctx, parms, false)
+	if !ok {
+		return
+	}
+
+	name := ctx.Params["name"] // This is the name the user used.
+
+	{
+		ins, err := trans.TotalInputs()
+		if err != nil {
+			reportResults(ctx, err.Error(), false)
+			return
+		}
+		outs, err := trans.TotalOutputs()
+		if err != nil {
+			reportResults(ctx, err.Error(), false)
+			return
+		}
+		ecs, err := trans.TotalECs()
+		if err != nil {
+			reportResults(ctx, err.Error(), false)
+			return
+		}
+
+		if ins != outs+ecs {
+			msg := fmt.Sprintf(
+				"Subfee requires that all the inputs balance the outputs.\n"+
+					"The total inputs of your transaction are              %s\n"+
+					"The total outputs + ecoutputs of your transaction are %s",
+				fct.ConvertDecimal(ins), fct.ConvertDecimal(outs+ecs))
+
+			reportResults(ctx, msg, false)
+			return
+		}
+	}
+
+	transfee, err := Wallet.FactoidSubFee(trans, key, address, name)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+		return
+	}
+
+	reportResults(ctx, fmt.Sprintf("Subtracted %s from %s", fct.ConvertDecimal(uint64(transfee)), name), true)
+	return
+}
+
 func HandleFactoidAddInput(ctx *web.Context, parms string) {
 	trans, key, _, address, amount, ok := getParams_(ctx, parms, false)
 

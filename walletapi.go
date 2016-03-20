@@ -89,12 +89,21 @@ func Start() {
 	// nobody cares.
 	server.Post("/v1/factoid-delete-transaction/([^/]+)", handlers.HandleFactoidDeleteTransaction)
 
-	// Add Input
-	// localhost:8089/v1/factoid-add-input/?key=<key>&name=<name or address>
-	// Add the fee for this transaction to the input specified by the name or address.
+	// Add Fee
+	// localhost:8089/v1/factoid-add-fee/?key=<key>&name=<name or address>
+	// Add the fee for this transaction to the input specified by the name or
+	// address.
 	// If the name or address is not an input to this transaction, then an error
 	// is posted.
 	server.Post("/v1/factoid-add-fee/(.*)", handlers.HandleFactoidAddFee)
+
+	// Sub Fee
+	// localhost:8089/v1/factoid-sub-fee/?key=<key>&name=<name or address>
+	// Subtract the fee for this transaction to the input specified by the name
+	// or address.
+	// If the name or address is not an input to this transaction, then an error
+	// is posted.
+	server.Post("/v1/factoid-sub-fee/(.*)", handlers.HandleFactoidSubFee)
 
 	// Add Input
 	// localhost:8089/v1/factoid-add-input/?key=<key>&name=<name or address>&amount=<amount>
