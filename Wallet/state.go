@@ -10,15 +10,15 @@ import (
 )
 
 var (
-	cfg             = util.ReadConfig().Wallet
 	applicationName = "Factom/fctwallet"
 
-	ipaddressFD  = cfg.FactomdAddress
-	portNumberFD = cfg.FactomdPort
-
 	databasefile = "factoid_wallet_bolt.db"
+
+	cfg              = util.ReadConfig()
+	ipaddressFD      = cfg.Wallet.Address
+	portNumberFD     = cfg.Wsapi.PortNumber
 )
 
-var factoidState = stateinit.NewFactoidState(cfg.BoltDBPath + databasefile)
+var factoidState = stateinit.NewFactoidState(cfg.Wallet.BoltDBPath + databasefile)
 
 const Version = "0.1.6.0"
