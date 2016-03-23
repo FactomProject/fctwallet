@@ -217,9 +217,25 @@ func HandleGetProcessedTransactions(ctx *web.Context, parms string) {
 func HandleGetProcessedTransactionsj(ctx *web.Context, parms string) {
 	cmd := ctx.Params["cmd"]
 	adr := ctx.Params["address"]
+	sstart := ctx.Params["start"]
+	send := ctx.Params["end"]
+
+	if len(sstart) == 0 {
+		sstart = "0"
+	}
+	if len(send) == 0 {
+		send = "0"
+	}
+
+	start, err1 := strconv.ParseInt(sstart, 10, 32)
+	end, err2 := strconv.ParseInt(send, 10, 32)
+	if err1 != nil || err2 != nil {
+		start = 0
+		end = 1000000000
+	}
 
 	if cmd == "all" {
-		list, err := Utility.DumpTransactionsJSON(nil)
+		list, err := Utility.DumpTransactionsJSON(nil, int(start), int(end))
 		if err != nil {
 			reportResults(ctx, err.Error(), false)
 			return
@@ -240,7 +256,7 @@ func HandleGetProcessedTransactionsj(ctx *web.Context, parms string) {
 		var adrs [][]byte
 		adrs = append(adrs, badr)
 
-		list, err := Utility.DumpTransactionsJSON(adrs)
+		list, err := Utility.DumpTransactionsJSON(adrs, int(start), int(end))
 		if err != nil {
 			reportResults(ctx, err.Error(), false)
 			return
@@ -406,6 +422,53 @@ func HandleFactoidAddFee(ctx *web.Context, params string) {
 	}
 
 	reportResults(ctx, fmt.Sprintf("Added %s to %s", primitives.ConvertDecimalToPaddedString(uint64(transfee)), name), true)
+	return
+}
+
+func HandleFactoidSubFee(ctx *web.Context, parms string) {
+	trans, key, _, address, _, ok := getParams_(ctx, parms, false)
+	if !ok {
+		return
+	}
+
+	name := ctx.Params["name"] // This is the name the user used.
+
+	{
+		ins, err := trans.TotalInputs()
+		if err != nil {
+			reportResults(ctx, err.Error(), false)
+			return
+		}
+		outs, err := trans.TotalOutputs()
+		if err != nil {
+			reportResults(ctx, err.Error(), false)
+			return
+		}
+		ecs, err := trans.TotalECs()
+		if err != nil {
+			reportResults(ctx, err.Error(), false)
+			return
+		}
+
+		if ins != outs+ecs {
+			msg := fmt.Sprintf(
+				"Subfee requires that all the inputs balance the outputs.\n"+
+					"The total inputs of your transaction are              %s\n"+
+					"The total outputs + ecoutputs of your transaction are %s",
+				primitives.ConvertDecimalToString(ins), primitives.ConvertDecimalToString(outs+ecs))
+
+			reportResults(ctx, msg, false)
+			return
+		}
+	}
+
+	transfee, err := Wallet.FactoidSubFee(trans, key, address, name)
+	if err != nil {
+		reportResults(ctx, err.Error(), false)
+		return
+	}
+
+	reportResults(ctx, fmt.Sprintf("Subtracted %s from %s", primitives.ConvertDecimalToString(uint64(transfee)), name), true)
 	return
 }
 

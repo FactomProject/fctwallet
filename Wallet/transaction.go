@@ -123,6 +123,55 @@ func FactoidAddFee(trans interfaces.ITransaction, key string, address interfaces
 	return 0, fmt.Errorf("%s is not an input to the transaction.", key)
 }
 
+func FactoidSubFee(trans interfaces.ITransaction, key string, address interfaces.IAddress, name string) (uint64, error) {
+	{
+		ins, err := trans.TotalInputs()
+		if err != nil {
+			return 0, err
+		}
+		outs, err := trans.TotalOutputs()
+		if err != nil {
+			return 0, err
+		}
+		ecs, err := trans.TotalECs()
+		if err != nil {
+			return 0, err
+		}
+
+		if ins != outs+ecs {
+			return 0, fmt.Errorf("Inputs and outputs don't add up")
+		}
+	}
+
+	ok := Utility.IsValidKey(key)
+	if !ok {
+		return 0, fmt.Errorf("Invalid name for transaction")
+	}
+
+	fee, err := GetFee()
+	if err != nil {
+		return 0, err
+	}
+
+	transfee, err := trans.CalculateFee(uint64(fee))
+	if err != nil {
+		return 0, err
+	}
+
+	adr, err := wallet.GetAddressHash(address)
+	if err != nil {
+		return 0, err
+	}
+
+	for _, output := range trans.GetOutputs() {
+		if output.GetAddress().IsSameAs(adr) {
+			output.SetAmount(output.GetAmount() - transfee)
+			return transfee, nil
+		}
+	}
+	return 0, fmt.Errorf("%s is not an input to the transaction.", key)
+}
+
 func FactoidAddInput(trans interfaces.ITransaction, key string, address interfaces.IAddress, amount uint64) error {
 	ok := Utility.IsValidKey(key)
 	if !ok {

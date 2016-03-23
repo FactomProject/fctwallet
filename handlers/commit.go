@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/FactomProject/web"
-	"github.com/FactomProject/fctwallet/Wallet"
 	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/factomd/wsapi"
+	"github.com/FactomProject/fctwallet/Wallet"
+	"github.com/FactomProject/web"
 )
 
 func HandleCommitChain(ctx *web.Context, name string) {
@@ -23,7 +23,7 @@ func HandleCommitChain(ctx *web.Context, name string) {
 		return
 	}
 
-	req:=new(CommitRequest)
+	req := new(CommitRequest)
 	req.Name = name
 	req.Data = string(data)
 
@@ -45,7 +45,7 @@ func HandleV2CommitChain(params interface{}) (interface{}, *primitives.JSONError
 		fmt.Println(err)
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
-	resp:=new(CommitResponse)
+	resp := new(CommitResponse)
 	resp.Success = "Success"
 	return resp, nil
 }
@@ -59,7 +59,7 @@ func HandleCommitEntry(ctx *web.Context, name string) {
 		return
 	}
 
-	req:=new(CommitRequest)
+	req := new(CommitRequest)
 	req.Name = name
 	req.Data = string(data)
 
@@ -81,7 +81,7 @@ func HandleV2CommitEntry(params interface{}) (interface{}, *primitives.JSONError
 		fmt.Println(err)
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
-	resp:=new(CommitResponse)
+	resp := new(CommitResponse)
 	resp.Success = "Success"
 	return resp, nil
 }

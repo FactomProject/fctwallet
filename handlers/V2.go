@@ -49,44 +49,43 @@ func HandleV2(ctx *web.Context, post bool) {
 }
 
 func HandleV2PostRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, *primitives.JSONError) {
-	//params := j.Params
+	params := j.Params
 	var resp interface{}
 	var jsonError *primitives.JSONError
-	/*
-		switch j.Method {
-		case "compose-chain-submit":
-			resp, jsonError = HandleV2ComposeChainSubmit(params)
-			break
-		case "compose-entry-submit":
-			resp, jsonError = HandleV2ComposeEntrySubmit(params)
-			break
-		case "factoid-new-transaction":
-			resp, jsonError = HandleV2FactoidNewTransaction(params)
-			break
-		case "factoid-delete-transaction":
-			resp, jsonError = HandleV2FactoidDeleteTransaction(params)
-			break
-		case "factoid-add-fee":
-			resp, jsonError = HandleV2FactoidAddFee(params)
-			break
-		case "factoid-add-input":
-			resp, jsonError = HandleV2FactoidAddInput(params)
-			break
-		case "factoid-add-output":
-			resp, jsonError = HandleV2FactoidAddOutput(params)
-			break
-		case "factoid-add-ecoutput":
-			resp, jsonError = HandleV2FactoidAddECOutput(params)
-			break
-		case "factoid-sign-transaction":
-			resp, jsonError = HandleV2FactoidSignTransaction(params)
-			break*/
-		case "commit-chain":
-			resp, jsonError = HandleV2CommitChain(params)
-			break
-		case "commit-entry":
-			resp, jsonError = HandleV2CommitEntry(params)
-			break
+	switch j.Method {
+	/*case "compose-chain-submit":
+		resp, jsonError = HandleV2ComposeChainSubmit(params)
+		break
+	case "compose-entry-submit":
+		resp, jsonError = HandleV2ComposeEntrySubmit(params)
+		break
+	case "factoid-new-transaction":
+		resp, jsonError = HandleV2FactoidNewTransaction(params)
+		break
+	case "factoid-delete-transaction":
+		resp, jsonError = HandleV2FactoidDeleteTransaction(params)
+		break
+	case "factoid-add-fee":
+		resp, jsonError = HandleV2FactoidAddFee(params)
+		break
+	case "factoid-add-input":
+		resp, jsonError = HandleV2FactoidAddInput(params)
+		break
+	case "factoid-add-output":
+		resp, jsonError = HandleV2FactoidAddOutput(params)
+		break
+	case "factoid-add-ecoutput":
+		resp, jsonError = HandleV2FactoidAddECOutput(params)
+		break
+	case "factoid-sign-transaction":
+		resp, jsonError = HandleV2FactoidSignTransaction(params)
+		break*/
+	case "commit-chain":
+		resp, jsonError = HandleV2CommitChain(params)
+		break
+	case "commit-entry":
+		resp, jsonError = HandleV2CommitEntry(params)
+		break
 		/*case "factoid-submit":
 			resp, jsonError = HandleV2FactoidSubmit(params)
 			break
@@ -95,9 +94,8 @@ func HandleV2PostRequest(j *primitives.JSON2Request) (*primitives.JSON2Response,
 			break
 		case "factoid-get-processed-transactionsj/":
 			resp, jsonError = HandleV2GetProcessedTransactionsj(params)
-			break
-		}
-	*/
+			break*/
+	}
 	if jsonError != nil {
 		return nil, jsonError
 	}

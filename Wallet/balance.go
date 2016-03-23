@@ -39,14 +39,11 @@ func LookupAddress(adrType string, adr string) (string, error) {
 					return "", fmt.Errorf("%s is a factoid address, not an entry credit address.", adr)
 				}
 			}
-
 			addr, _ := we.GetAddress()
 			adr = hex.EncodeToString(addr.Bytes())
 		} else {
 			return "", fmt.Errorf("Name %s is undefined.", adr)
 		}
-	} else {
-		return "", fmt.Errorf("Invalid Name.  Check that you have entered the name correctly.")
 	}
 
 	return adr, nil

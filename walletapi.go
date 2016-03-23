@@ -6,10 +6,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/FactomProject/web"
 	"time"
 
 	"github.com/FactomProject/fctwallet/handlers"
+	"github.com/FactomProject/web"
 )
 
 var server = web.NewServer()
@@ -47,6 +47,10 @@ func Start() {
 
 	server.Get("/v1/factoid-generate-address-from-token-sale/(.*)", handlers.HandleFactoidGenerateAddressFromMnemonic)
 
+	// resolve-address does a DNS lookup of an address on netki and returns a
+	// human readable factoid and/or entry credit address
+	server.Get("/v1/resolve-address/(.*)", handlers.HandleResolveAddress)
+
 	// verify-address-type
 	// localhost:8089/v1/verify-address-type/address=<address>
 	// take address and define its type or fail if not valid address
@@ -80,12 +84,21 @@ func Start() {
 	// nobody cares.
 	server.Post("/v1/factoid-delete-transaction/([^/]+)", handlers.HandleFactoidDeleteTransaction)
 
-	// Add Input
-	// localhost:8089/v1/factoid-add-input/?key=<key>&name=<name or address>
-	// Add the fee for this transaction to the input specified by the name or address.
+	// Add Fee
+	// localhost:8089/v1/factoid-add-fee/?key=<key>&name=<name or address>
+	// Add the fee for this transaction to the input specified by the name or
+	// address.
 	// If the name or address is not an input to this transaction, then an error
 	// is posted.
 	server.Post("/v1/factoid-add-fee/(.*)", handlers.HandleFactoidAddFee)
+
+	// Sub Fee
+	// localhost:8089/v1/factoid-sub-fee/?key=<key>&name=<name or address>
+	// Subtract the fee for this transaction to the input specified by the name
+	// or address.
+	// If the name or address is not an input to this transaction, then an error
+	// is posted.
+	server.Post("/v1/factoid-sub-fee/(.*)", handlers.HandleFactoidSubFee)
 
 	// Add Input
 	// localhost:8089/v1/factoid-add-input/?key=<key>&name=<name or address>&amount=<amount>
@@ -175,7 +188,6 @@ func Start() {
 }
 
 func main() {
-
 	fmt.Println("+================+")
 	fmt.Println("|  fctwallet v1  |")
 	fmt.Println("+================+")
