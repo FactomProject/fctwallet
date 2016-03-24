@@ -115,7 +115,7 @@ func FactoidAddFee(trans fct.ITransaction, key string, address fct.IAddress, nam
 			return transfee, nil
 		}
 	}
-	return 0, fmt.Errorf("%s is not an input to the transaction.", key)
+	return 0, fmt.Errorf("%s is not an input to the transaction.", name)
 }
 
 func FactoidSubFee(trans fct.ITransaction, key string, address fct.IAddress, name string) (uint64, error) {
@@ -165,7 +165,7 @@ func FactoidSubFee(trans fct.ITransaction, key string, address fct.IAddress, nam
 			return transfee, nil
 		}
 	}
-	return 0, fmt.Errorf("%s is not an input to the transaction.", key)
+	return 0, fmt.Errorf("%s is not an output to the transaction.", name)
 }
 
 func FactoidAddInput(trans fct.ITransaction, key string, address fct.IAddress, amount uint64) error {
