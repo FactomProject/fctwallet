@@ -12,7 +12,7 @@ import (
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factomd/common/constants"
 	"github.com/FactomProject/factomd/common/directoryBlock"
-	"github.com/FactomProject/factomd/common/factoid/block"
+	"github.com/FactomProject/factomd/common/factoid"
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/common/primitives"
 )
@@ -74,7 +74,7 @@ func getAll() error {
 
 	for i := len(dbs) - 1; i >= 0; i-- {
 		DirectoryBlocks = append(DirectoryBlocks, dbs[i])
-		fb := new(block.FBlock)
+		fb := new(factoid.FBlock)
 		var fcnt int
 		for _, dbe := range dbs[i].DBEntries {
 			if bytes.Equal(dbe.GetChainID().Bytes(), constants.FACTOID_CHAINID) {
