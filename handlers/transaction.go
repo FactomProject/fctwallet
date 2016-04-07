@@ -65,7 +65,7 @@ func reportResults(ctx *web.Context, response string, success bool) {
 	}
 }
 
-func getTransaction(ctx *web.Context, key string) (interfaces.ITransaction, error) {
+func getTransaction(key string) (interfaces.ITransaction, error) {
 	return Wallet.GetTransaction(key)
 }
 
@@ -110,7 +110,7 @@ func getParams_(ctx *web.Context, params string, ec bool) (
 	}
 
 	// Get the transaction
-	trans, err = getTransaction(ctx, key)
+	trans, err = getTransaction(key)
 	if err != nil {
 		reportResults(ctx, "Failure to locate the transaction", false)
 		ok = false
@@ -552,7 +552,7 @@ func HandleGetFee(ctx *web.Context, k string) {
 	fmt.Println("getfee", key)
 
 	if len(key) > 0 {
-		trans, err = getTransaction(ctx, key)
+		trans, err = getTransaction(key)
 		if err != nil {
 			reportResults(ctx, "Failure to locate the transaction", false)
 			return

@@ -5,10 +5,11 @@
 package handlers
 
 import (
+	"io/ioutil"
+
 	"github.com/FactomProject/factomd/common/primitives"
 	"github.com/FactomProject/factomd/wsapi"
 	"github.com/FactomProject/web"
-	"io/ioutil"
 )
 
 func HandleV2Get(ctx *web.Context) {
