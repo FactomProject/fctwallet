@@ -29,6 +29,11 @@ type FactoidBalanceResponse struct {
 	Balance int64
 }
 
+type ResolveAddressResponse struct {
+	FactoidAddress     string
+	EntryCreditAddress string
+}
+
 //Commit
 
 type CommitRequest struct {

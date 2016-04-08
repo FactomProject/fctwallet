@@ -177,19 +177,21 @@ func HandleV2FactoidBalance(params interface{}) (interface{}, *primitives.JSONEr
 }
 
 func HandleResolveAddress(ctx *web.Context, adr string) {
+	req := primitives.NewJSON2Request(1, adr, "resolve-address")
+
+	jsonResp, jsonError := HandleV2GetRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
+		return
+	}
+
 	type x struct {
 		Fct, Ec string
 	}
 
-	f, e, err := Wallet.NetkiResolve(adr)
-	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
-	}
-
 	t := new(x)
-	t.Fct = f
-	t.Ec = e
+	t.Fct = jsonResp.Result.(*ResolveAddressResponse).FactoidAddress
+	t.Ec = jsonResp.Result.(*ResolveAddressResponse).EntryCreditAddress
 	p, err := json.Marshal(t)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
@@ -197,4 +199,22 @@ func HandleResolveAddress(ctx *web.Context, adr string) {
 	}
 
 	reportResults(ctx, string(p), true)
+}
+
+func HandleV2ResolveAddress(params interface{}) (interface{}, *primitives.JSONError) {
+	adr, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	fAddress, ecAddress, err := Wallet.NetkiResolve(adr)
+	if err != nil {
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+
+	resp := new(ResolveAddressResponse)
+	resp.FactoidAddress = fAddress
+	resp.EntryCreditAddress = ecAddress
+
+	return resp, nil
 }

@@ -141,6 +141,9 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 	case "factoid-generate-address-from-token-sale":
 		resp, jsonError = HandleV2FactoidGenerateAddressFromMnemonic(params)
 		break
+	case "resolve-address":
+		resp, jsonError = HandleV2ResolveAddress(params)
+		break
 	case "verify-address-type":
 		resp, jsonError = HandleV2VerifyAddressType(params)
 		break
