@@ -65,6 +65,14 @@ type FactoidFeeResponse struct {
 	FeeDelta int64
 }
 
+type GetFeeResponse struct {
+	Fee int64
+}
+
+type MessageResponse struct {
+	Message string
+}
+
 /*Requests*/
 
 type GenerateAddressFromPrivateKeyRequest struct {

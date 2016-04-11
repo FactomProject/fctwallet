@@ -247,6 +247,6 @@ func getParams_(ctx *web.Context, params string, ec bool) (
 	return
 }
 
-/*************************************************************************
- * Handler Functions
- *************************************************************************/
+func GetFee(ctx *web.Context) (int64, error) {
+	return Wallet.GetFee()
+}

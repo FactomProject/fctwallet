@@ -66,6 +66,7 @@ func HandleV2PostRequest(j *primitives.JSON2Request) (*primitives.JSON2Response,
 	case "factoid-delete-transaction":
 		resp, jsonError = HandleV2FactoidDeleteTransaction(params)
 		break
+	*/
 	case "factoid-sub-fee":
 		resp, jsonError = HandleV2FactoidSubFee(params)
 		break
@@ -83,22 +84,23 @@ func HandleV2PostRequest(j *primitives.JSON2Request) (*primitives.JSON2Response,
 		break
 	case "factoid-sign-transaction":
 		resp, jsonError = HandleV2FactoidSignTransaction(params)
-		break*/
+		break
 	case "commit-chain":
 		resp, jsonError = HandleV2CommitChain(params)
 		break
 	case "commit-entry":
 		resp, jsonError = HandleV2CommitEntry(params)
 		break
-		/*case "factoid-submit":
-			resp, jsonError = HandleV2FactoidSubmit(params)
-			break
-		case "factoid-get-processed-transactions":
-			resp, jsonError = HandleV2GetProcessedTransactions(params)
-			break
-		case "factoid-get-processed-transactionsj/":
-			resp, jsonError = HandleV2GetProcessedTransactionsj(params)
-			break*/
+	case "factoid-submit":
+		resp, jsonError = HandleV2FactoidSubmit(params)
+		break
+		/*
+			case "factoid-get-processed-transactions":
+				resp, jsonError = HandleV2GetProcessedTransactions(params)
+				break
+			case "factoid-get-processed-transactionsj/":
+				resp, jsonError = HandleV2GetProcessedTransactionsj(params)
+				break*/
 	}
 	if jsonError != nil {
 		return nil, jsonError

@@ -233,7 +233,7 @@ func HandleFactoidAddFee(ctx *web.Context, params string) {
 	}
 	req := primitives.NewJSON2Request(1, par, "factoid-add-fee")
 
-	jsonResp, jsonError := HandleV2GetRequest(req)
+	jsonResp, jsonError := HandleV2PostRequest(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -295,7 +295,7 @@ func HandleFactoidSubFee(ctx *web.Context, params string) {
 	}
 	req := primitives.NewJSON2Request(1, par, "factoid-sub-fee")
 
-	jsonResp, jsonError := HandleV2GetRequest(req)
+	jsonResp, jsonError := HandleV2PostRequest(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -347,77 +347,166 @@ func HandleV2FactoidSubFee(params interface{}) (interface{}, *primitives.JSONErr
 }
 
 func HandleFactoidAddInput(ctx *web.Context, parms string) {
-	trans, key, _, address, amount, ok := getParams_(ctx, parms, false)
+	par := V1toV2Params(ctx)
+	if par == nil {
+		fmt.Println("Not OK")
+		return
+	}
+	req := primitives.NewJSON2Request(1, par, "factoid-add-input")
 
-	if !ok {
+	jsonResp, jsonError := HandleV2PostRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
 		return
 	}
 
-	err := Wallet.FactoidAddInput(trans, key, address, uint64(amount))
+	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
+	return
+}
+
+func HandleV2FactoidAddInput(params interface{}) (interface{}, *primitives.JSONError) {
+	pars, jerror := GetV2Params(params)
+	if jerror != nil {
+		return nil, jerror
+	}
+
+	err := Wallet.FactoidAddInput(pars.Transaction, pars.Key, pars.Address, uint64(pars.Amount))
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, "Success adding Input", true)
+	resp := new(MessageResponse)
+	resp.Message = "Success adding Input"
+	return resp, nil
 }
 
 func HandleFactoidAddOutput(ctx *web.Context, parms string) {
-	trans, key, _, address, amount, ok := getParams_(ctx, parms, false)
-	if !ok {
+	par := V1toV2Params(ctx)
+	if par == nil {
+		fmt.Println("Not OK")
+		return
+	}
+	req := primitives.NewJSON2Request(1, par, "factoid-add-output")
+
+	jsonResp, jsonError := HandleV2PostRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
 		return
 	}
 
-	err := Wallet.FactoidAddOutput(trans, key, address, uint64(amount))
+	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
+	return
+}
+
+func HandleV2FactoidAddOutput(params interface{}) (interface{}, *primitives.JSONError) {
+	pars, jerror := GetV2Params(params)
+	if jerror != nil {
+		return nil, jerror
+	}
+
+	err := Wallet.FactoidAddOutput(pars.Transaction, pars.Key, pars.Address, uint64(pars.Amount))
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, "Success adding output", true)
+	resp := new(MessageResponse)
+	resp.Message = "Success adding Output"
+	return resp, nil
 }
 
 func HandleFactoidAddECOutput(ctx *web.Context, parms string) {
-	trans, key, _, address, amount, ok := getParams_(ctx, parms, true)
-	if !ok {
+	par := V1toV2Params(ctx)
+	if par == nil {
+		fmt.Println("Not OK")
+		return
+	}
+	req := primitives.NewJSON2Request(1, par, "factoid-add-ecoutput")
+
+	jsonResp, jsonError := HandleV2PostRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
 		return
 	}
 
-	err := Wallet.FactoidAddECOutput(trans, key, address, uint64(amount))
+	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
+	return
+}
+
+func HandleV2FactoidAddECOutput(params interface{}) (interface{}, *primitives.JSONError) {
+	pars, jerror := GetV2Params(params)
+	if jerror != nil {
+		return nil, jerror
+	}
+
+	err := Wallet.FactoidAddECOutput(pars.Transaction, pars.Key, pars.Address, uint64(pars.Amount))
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, "Success adding Entry Credit Output", true)
+	resp := new(MessageResponse)
+	resp.Message = "Success adding Entry Credit Output"
+	return resp, nil
 }
 
 func HandleFactoidSignTransaction(ctx *web.Context, key string) {
-	err := Wallet.FactoidSignTransaction(key)
-	if err != nil {
-		reportResults(ctx, err.Error(), false)
+	req := primitives.NewJSON2Request(1, key, "factoid-sign-transaction")
+
+	jsonResp, jsonError := HandleV2PostRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
 		return
 	}
 
-	reportResults(ctx, "Success signing transaction", true)
+	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
+	return
+}
+
+func HandleV2FactoidSignTransaction(params interface{}) (interface{}, *primitives.JSONError) {
+	key, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	err := Wallet.FactoidSignTransaction(key)
+	if err != nil {
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+
+	resp := new(MessageResponse)
+	resp.Message = "Success signing transaction"
+	return resp, nil
 }
 
 func HandleFactoidSubmit(ctx *web.Context, jsonkey string) {
-	_, err := Wallet.FactoidSubmit(jsonkey)
-	if err != nil {
-		reportResults(ctx, err.Error(), false)
+	req := primitives.NewJSON2Request(1, jsonkey, "factoid-submit")
+
+	jsonResp, jsonError := HandleV2PostRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
 		return
 	}
 
-	reportResults(ctx, "Success Submitting transaction", true)
+	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
+	return
 }
 
-func GetFee(ctx *web.Context) (int64, error) {
-	return Wallet.GetFee()
+func HandleV2FactoidSubmit(params interface{}) (interface{}, *primitives.JSONError) {
+	jsonkey, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
+	_, err := Wallet.FactoidSubmit(jsonkey)
+	if err != nil {
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+
+	resp := new(MessageResponse)
+	resp.Message = "Success Submitting transaction"
+	return resp, nil
 }
 
 func HandleGetFee(ctx *web.Context, k string) {
-
 	var trans interfaces.ITransaction
 	var err error
 
