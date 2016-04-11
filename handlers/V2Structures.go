@@ -73,6 +73,13 @@ type MessageResponse struct {
 	Message string
 }
 
+type PropertiesResponse struct {
+	ProtocolVersion  string
+	FactomdVersion   string
+	FCTWalletVersion string
+	Message          string
+}
+
 /*Requests*/
 
 type GenerateAddressFromPrivateKeyRequest struct {

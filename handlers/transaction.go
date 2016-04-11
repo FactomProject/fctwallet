@@ -171,25 +171,36 @@ func HandleFactoidSetup(ctx *web.Context, seed string) {
 // their own keys. Once a transaction is either submitted or deleted, the key
 // can be reused.
 func HandleFactoidNewTransaction(ctx *web.Context, key string) {
-	// Make sure we have a key
-	if len(key) == 0 {
-		reportResults(ctx, "Missing transaction key", false)
+	req := primitives.NewJSON2Request(1, key, "factoid-new-transaction")
+
+	jsonResp, jsonError := HandleV2PostRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
 		return
+	}
+
+	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
+}
+
+func HandleV2FactoidNewTransaction(params interface{}) (interface{}, *primitives.JSONError) {
+	key, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
 	}
 
 	msg, valid := ValidateKey(key)
 	if !valid {
-		reportResults(ctx, msg, false)
-		return
+		return nil, wsapi.NewCustomInvalidParamsError(msg)
 	}
 
 	err := Wallet.FactoidNewTransaction(key)
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, "Success building a transaction", true)
+	resp := new(MessageResponse)
+	resp.Message = "Success building a transaction"
+	return resp, nil
 }
 
 // Delete Transaction:  key --
@@ -197,32 +208,65 @@ func HandleFactoidNewTransaction(ctx *web.Context, key string) {
 // you just need to throw one a way, and rebuild it.
 //
 func HandleFactoidDeleteTransaction(ctx *web.Context, key string) {
+	req := primitives.NewJSON2Request(1, key, "factoid-delete-transaction")
+
+	jsonResp, jsonError := HandleV2PostRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
+		return
+	}
+
+	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
+}
+
+func HandleV2FactoidDeleteTransaction(params interface{}) (interface{}, *primitives.JSONError) {
+	key, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
 	// Make sure we have a key
 	if len(key) == 0 {
-		reportResults(ctx, "Missing transaction key", false)
-		return
+		return nil, wsapi.NewInvalidParamsError()
 	}
 	err := Wallet.FactoidDeleteTransaction(key)
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
-	reportResults(ctx, "Success deleting transaction", true)
+	resp := new(MessageResponse)
+	resp.Message = "Success deleting transaction"
+	return resp, nil
 }
 
 func HandleProperties(ctx *web.Context) {
+	req := primitives.NewJSON2Request(1, nil, "properties")
+
+	jsonResp, jsonError := HandleV2GetRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
+		return
+	}
+
+	reportResults(ctx, jsonResp.Result.(*PropertiesResponse).Message, true)
+}
+
+func HandleV2Properties(params interface{}) (interface{}, *primitives.JSONError) {
 	p, f, w, err := Wallet.GetProperties()
 	if err != nil {
-		reportResults(ctx, "Failed to retrieve properties", false)
-		return
+		return nil, wsapi.NewCustomInternalError("Failed to retrieve properties")
 	}
 
 	ret := fmt.Sprintf("Protocol Version:   %s\n", p)
 	ret = ret + fmt.Sprintf("factomd Version:    %s\n", f)
 	ret = ret + fmt.Sprintf("fctwallet Version:  %s\n", w)
 
-	reportResults(ctx, ret, true)
+	resp := new(PropertiesResponse)
+	resp.Message = ret
+	resp.ProtocolVersion = p
+	resp.FactomdVersion = f
+	resp.FCTWalletVersion = w
 
+	return resp, nil
 }
 
 func HandleFactoidAddFee(ctx *web.Context, params string) {
@@ -240,7 +284,6 @@ func HandleFactoidAddFee(ctx *web.Context, params string) {
 	}
 
 	reportResults(ctx, jsonResp.Result.(*FactoidFeeResponse).Message, true)
-	return
 }
 
 func HandleV2FactoidAddFee(params interface{}) (interface{}, *primitives.JSONError) {
@@ -302,7 +345,6 @@ func HandleFactoidSubFee(ctx *web.Context, params string) {
 	}
 
 	reportResults(ctx, jsonResp.Result.(*FactoidFeeResponse).Message, true)
-	return
 }
 
 func HandleV2FactoidSubFee(params interface{}) (interface{}, *primitives.JSONError) {
@@ -361,7 +403,6 @@ func HandleFactoidAddInput(ctx *web.Context, parms string) {
 	}
 
 	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
-	return
 }
 
 func HandleV2FactoidAddInput(params interface{}) (interface{}, *primitives.JSONError) {
@@ -395,7 +436,6 @@ func HandleFactoidAddOutput(ctx *web.Context, parms string) {
 	}
 
 	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
-	return
 }
 
 func HandleV2FactoidAddOutput(params interface{}) (interface{}, *primitives.JSONError) {
@@ -429,7 +469,6 @@ func HandleFactoidAddECOutput(ctx *web.Context, parms string) {
 	}
 
 	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
-	return
 }
 
 func HandleV2FactoidAddECOutput(params interface{}) (interface{}, *primitives.JSONError) {
@@ -458,7 +497,6 @@ func HandleFactoidSignTransaction(ctx *web.Context, key string) {
 	}
 
 	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
-	return
 }
 
 func HandleV2FactoidSignTransaction(params interface{}) (interface{}, *primitives.JSONError) {
@@ -487,7 +525,6 @@ func HandleFactoidSubmit(ctx *web.Context, jsonkey string) {
 	}
 
 	reportResults(ctx, jsonResp.Result.(*MessageResponse).Message, true)
-	return
 }
 
 func HandleV2FactoidSubmit(params interface{}) (interface{}, *primitives.JSONError) {
@@ -507,25 +544,39 @@ func HandleV2FactoidSubmit(params interface{}) (interface{}, *primitives.JSONErr
 }
 
 func HandleGetFee(ctx *web.Context, k string) {
+	key := ctx.Params["key"]
+	req := primitives.NewJSON2Request(1, key, "factoid-get-fee")
+
+	jsonResp, jsonError := HandleV2GetRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
+		return
+	}
+
+	reportResults(ctx, fmt.Sprintf("%s", primitives.ConvertDecimalToString(uint64(jsonResp.Result.(*GetFeeResponse).Fee))), true)
+}
+
+func HandleV2GetFee(params interface{}) (interface{}, *primitives.JSONError) {
+	key, ok := params.(string)
+	if ok == false {
+		return nil, wsapi.NewInvalidParamsError()
+	}
+
 	var trans interfaces.ITransaction
 	var err error
-
-	key := ctx.Params["key"]
 
 	fmt.Println("getfee", key)
 
 	if len(key) > 0 {
 		trans, err = getTransaction(key)
 		if err != nil {
-			reportResults(ctx, "Failure to locate the transaction", false)
-			return
+			return nil, wsapi.NewCustomInternalError("Failure to locate the transaction")
 		}
 	}
 
 	fee, err := Wallet.GetFee()
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
 	if trans != nil {
@@ -533,7 +584,9 @@ func HandleGetFee(ctx *web.Context, k string) {
 		fee = int64(ufee)
 	}
 
-	reportResults(ctx, fmt.Sprintf("%s", primitives.ConvertDecimalToString(uint64(fee))), true)
+	resp := new(GetFeeResponse)
+	resp.Fee = int64(fee)
+	return resp, nil
 }
 
 func GetAddresses() []byte {

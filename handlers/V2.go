@@ -60,13 +60,13 @@ func HandleV2PostRequest(j *primitives.JSON2Request) (*primitives.JSON2Response,
 	case "compose-entry-submit":
 		resp, jsonError = HandleV2ComposeEntrySubmit(params)
 		break
+	*/
 	case "factoid-new-transaction":
 		resp, jsonError = HandleV2FactoidNewTransaction(params)
 		break
 	case "factoid-delete-transaction":
 		resp, jsonError = HandleV2FactoidDeleteTransaction(params)
 		break
-	*/
 	case "factoid-sub-fee":
 		resp, jsonError = HandleV2FactoidSubFee(params)
 		break
@@ -152,22 +152,22 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 	case "verify-address-type":
 		resp, jsonError = HandleV2VerifyAddressType(params)
 		break
-		/*case "factoid-validate":
-			resp, jsonError = HandleV2FactoidValidate(params)
-			break
-		case "factoid-get-fee":
-			resp, jsonError = HandleV2GetFee(params)
-			break
-		case "factoid-validate":
-			resp, jsonError = HandleV2FactoidValidate(params)
-			break
-		case "factoid-get-fee":
-			resp, jsonError = HandleV2GetFee(params)
-			break
-		case "properties":
-			resp, jsonError = HandleV2Properties(params)
-			break
-		case "factoid-get-addresses":
+	/*case "factoid-validate":
+		resp, jsonError = HandleV2FactoidValidate(params)
+		break
+	case "factoid-get-fee":
+		resp, jsonError = HandleV2GetFee(params)
+		break
+	case "factoid-validate":
+		resp, jsonError = HandleV2FactoidValidate(params)
+		break*/
+	case "factoid-get-fee":
+		resp, jsonError = HandleV2GetFee(params)
+		break
+	case "properties":
+		resp, jsonError = HandleV2Properties(params)
+		break
+		/*case "factoid-get-addresses":
 			resp, jsonError = HandleV2GetAddresses(params)
 			break
 		case "factoid-get-transactions":
