@@ -6,6 +6,8 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/FactomProject/web"
+	"strconv"
 
 	"github.com/FactomProject/factomd/common/constants"
 	"github.com/FactomProject/factomd/common/factoid"
@@ -56,6 +58,15 @@ type VerifyAddressTypeResponse struct {
 	Valid bool
 }
 
+//Transaction
+
+type FactoidFeeResponse struct {
+	Message  string
+	FeeDelta int64
+}
+
+/*Requests*/
+
 type GenerateAddressFromPrivateKeyRequest struct {
 	Name       string `json:"name"`
 	PrivateKey string `json:"privateKey,omitempty"`
@@ -68,6 +79,27 @@ type RequestParams struct {
 	Amount      int64  `json:"amount,omitempty"`
 	Address     interfaces.IAddress
 	Transaction interfaces.ITransaction
+}
+
+// &key=<key>&name=<name or address>&amount=<amount>
+// If no amount is specified, a zero is returned.
+func V1toV2Params(ctx *web.Context) *RequestParams {
+	req := new(RequestParams)
+	req.Key = ctx.Params["key"]
+	req.Name = ctx.Params["name"]
+	StrAmount := ctx.Params["amount"]
+
+	if len(StrAmount) == 0 {
+		StrAmount = "0"
+	}
+
+	amount, err := strconv.ParseInt(StrAmount, 10, 64)
+	if err != nil {
+		return nil
+	}
+	req.Amount = amount
+
+	return req
 }
 
 // &key=<key>&name=<name or address>&amount=<amount>

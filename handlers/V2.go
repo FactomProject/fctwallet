@@ -66,6 +66,9 @@ func HandleV2PostRequest(j *primitives.JSON2Request) (*primitives.JSON2Response,
 	case "factoid-delete-transaction":
 		resp, jsonError = HandleV2FactoidDeleteTransaction(params)
 		break
+	case "factoid-sub-fee":
+		resp, jsonError = HandleV2FactoidSubFee(params)
+		break
 	case "factoid-add-fee":
 		resp, jsonError = HandleV2FactoidAddFee(params)
 		break

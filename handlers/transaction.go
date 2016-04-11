@@ -16,6 +16,7 @@ import (
 
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/common/primitives"
+	"github.com/FactomProject/factomd/wsapi"
 	"github.com/FactomProject/fctwallet/Wallet"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
 )
@@ -225,31 +226,43 @@ func HandleProperties(ctx *web.Context) {
 }
 
 func HandleFactoidAddFee(ctx *web.Context, params string) {
-	trans, key, _, address, _, ok := getParams_(ctx, params, false)
-	if !ok {
+	par := V1toV2Params(ctx)
+	if par == nil {
 		fmt.Println("Not OK")
 		return
 	}
+	req := primitives.NewJSON2Request(1, par, "factoid-add-fee")
 
-	name := ctx.Params["name"] // This is the name the user used.
-
-	ins, err := trans.TotalInputs()
-	if err != nil {
-		fmt.Println(err.Error())
-		reportResults(ctx, err.Error(), false)
+	jsonResp, jsonError := HandleV2GetRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
 		return
 	}
-	outs, err := trans.TotalOutputs()
-	if err != nil {
-		fmt.Println(err.Error())
-		reportResults(ctx, err.Error(), false)
-		return
+
+	reportResults(ctx, jsonResp.Result.(*FactoidFeeResponse).Message, true)
+	return
+}
+
+func HandleV2FactoidAddFee(params interface{}) (interface{}, *primitives.JSONError) {
+	pars, jerror := GetV2Params(params)
+	if jerror != nil {
+		return nil, jerror
 	}
-	ecs, err := trans.TotalECs()
+
+	ins, err := pars.Transaction.TotalInputs()
 	if err != nil {
 		fmt.Println(err.Error())
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+	outs, err := pars.Transaction.TotalOutputs()
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+	ecs, err := pars.Transaction.TotalECs()
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
 	if ins != outs+ecs {
@@ -260,65 +273,77 @@ func HandleFactoidAddFee(ctx *web.Context, params string) {
 			primitives.ConvertDecimalToPaddedString(ins), primitives.ConvertDecimalToPaddedString(outs+ecs))
 
 		fmt.Println(msg)
-		reportResults(ctx, msg, false)
-		return
+		return nil, wsapi.NewCustomInternalError("Inputs do not balance the outputs")
 	}
 
-	transfee, err := Wallet.FactoidAddFee(trans, key, address, name)
+	transfee, err := Wallet.FactoidAddFee(pars.Transaction, pars.Key, pars.Address, pars.Name)
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+
+	resp := new(FactoidFeeResponse)
+	resp.Message = fmt.Sprintf("Added %s to %s", primitives.ConvertDecimalToPaddedString(uint64(transfee)), pars.Name)
+	resp.FeeDelta = int64(transfee)
+	return resp, nil
+}
+
+func HandleFactoidSubFee(ctx *web.Context, params string) {
+	par := V1toV2Params(ctx)
+	if par == nil {
+		fmt.Println("Not OK")
+		return
+	}
+	req := primitives.NewJSON2Request(1, par, "factoid-sub-fee")
+
+	jsonResp, jsonError := HandleV2GetRequest(req)
+	if jsonError != nil {
+		reportResults(ctx, jsonError.Message, false)
 		return
 	}
 
-	reportResults(ctx, fmt.Sprintf("Added %s to %s", primitives.ConvertDecimalToPaddedString(uint64(transfee)), name), true)
+	reportResults(ctx, jsonResp.Result.(*FactoidFeeResponse).Message, true)
 	return
 }
 
-func HandleFactoidSubFee(ctx *web.Context, parms string) {
-	trans, key, _, address, _, ok := getParams_(ctx, parms, false)
-	if !ok {
-		return
+func HandleV2FactoidSubFee(params interface{}) (interface{}, *primitives.JSONError) {
+	pars, jerror := GetV2Params(params)
+	if jerror != nil {
+		return nil, jerror
 	}
 
-	name := ctx.Params["name"] // This is the name the user used.
-
-	{
-		ins, err := trans.TotalInputs()
-		if err != nil {
-			reportResults(ctx, err.Error(), false)
-			return
-		}
-		outs, err := trans.TotalOutputs()
-		if err != nil {
-			reportResults(ctx, err.Error(), false)
-			return
-		}
-		ecs, err := trans.TotalECs()
-		if err != nil {
-			reportResults(ctx, err.Error(), false)
-			return
-		}
-
-		if ins != outs+ecs {
-			msg := fmt.Sprintf(
-				"Subfee requires that all the inputs balance the outputs.\n"+
-					"The total inputs of your transaction are              %s\n"+
-					"The total outputs + ecoutputs of your transaction are %s",
-				primitives.ConvertDecimalToString(ins), primitives.ConvertDecimalToString(outs+ecs))
-
-			reportResults(ctx, msg, false)
-			return
-		}
-	}
-
-	transfee, err := Wallet.FactoidSubFee(trans, key, address, name)
+	ins, err := pars.Transaction.TotalInputs()
 	if err != nil {
-		reportResults(ctx, err.Error(), false)
-		return
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+	outs, err := pars.Transaction.TotalOutputs()
+	if err != nil {
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+	ecs, err := pars.Transaction.TotalECs()
+	if err != nil {
+		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
 
-	reportResults(ctx, fmt.Sprintf("Subtracted %s from %s", primitives.ConvertDecimalToString(uint64(transfee)), name), true)
-	return
+	if ins != outs+ecs {
+		msg := fmt.Sprintf(
+			"Subfee requires that all the inputs balance the outputs.\n"+
+				"The total inputs of your transaction are              %s\n"+
+				"The total outputs + ecoutputs of your transaction are %s",
+			primitives.ConvertDecimalToString(ins), primitives.ConvertDecimalToString(outs+ecs))
+
+		fmt.Println(msg)
+		return nil, wsapi.NewCustomInternalError("Inputs do not balance the outputs")
+	}
+
+	transfee, err := Wallet.FactoidSubFee(pars.Transaction, pars.Key, pars.Address, pars.Name)
+	if err != nil {
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+
+	resp := new(FactoidFeeResponse)
+	resp.Message = fmt.Sprintf("Subtracted %s from %s", primitives.ConvertDecimalToPaddedString(uint64(transfee)), pars.Name)
+	resp.FeeDelta = -int64(transfee)
+	return resp, nil
 }
 
 func HandleFactoidAddInput(ctx *web.Context, parms string) {
