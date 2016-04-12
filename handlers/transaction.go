@@ -590,65 +590,88 @@ func HandleV2GetFee(params interface{}) (interface{}, *primitives.JSONError) {
 }
 
 func GetAddresses() []byte {
+	addResp := GetV2Addresses()
+
+	var maxlen int
+
+	for i := range addResp.EntryCreditAddressed {
+		if len(addResp.EntryCreditAddressed[i].Key) > maxlen {
+			maxlen = len(addResp.EntryCreditAddressed[i].Key)
+		}
+	}
+	for i := range addResp.FactoidAddressed {
+		if len(addResp.FactoidAddressed[i].Key) > maxlen {
+			maxlen = len(addResp.FactoidAddressed[i].Key)
+		}
+	}
+
+	var out bytes.Buffer
+	if len(addResp.FactoidAddressed) > 0 {
+		out.WriteString("\n  Factoid Addresses\n\n")
+	}
+	fstr := fmt.Sprintf("%s%vs    %s38s %s14s\n", "%", maxlen+4, "%", "%")
+	for _, fAdd := range addResp.FactoidAddressed {
+		bal := primitives.ConvertDecimalToString(uint64(fAdd.BalanceDecimal))
+		str := fmt.Sprintf(fstr, fAdd.Key, fAdd.Address, bal)
+		out.WriteString(str)
+	}
+	if len(addResp.EntryCreditAddressed) > 0 {
+		out.WriteString("\n  Entry Credit Addresses\n\n")
+	}
+	for _, ecAdd := range addResp.EntryCreditAddressed {
+		bal := primitives.ConvertDecimalToString(uint64(ecAdd.BalanceDecimal))
+		str := fmt.Sprintf(fstr, ecAdd.Key, ecAdd.Address, bal)
+		out.WriteString(str)
+	}
+
+	return out.Bytes()
+}
+
+func GetV2Addresses() *AddressesResponse {
 	values, err := Wallet.GetAddresses()
 	if err != nil {
 		panic(err)
 	}
 
-	ecKeys := make([]string, 0, len(values))
-	fctKeys := make([]string, 0, len(values))
-	ecBalances := make([]string, 0, len(values))
-	fctBalances := make([]string, 0, len(values))
-	fctAddresses := make([]string, 0, len(values))
-	ecAddresses := make([]string, 0, len(values))
+	eca := make([]Address, 0, len(values))
+	fa := make([]Address, 0, len(values))
 
-	var maxlen int
 	for _, we := range values {
-		if len(we.GetName()) > maxlen {
-			maxlen = len(we.GetName())
-		}
-		var adr string
+		var add Address
 		if we.GetType() == "ec" {
 			address, err := we.GetAddress()
 			if err != nil {
 				continue
 			}
-			adr = primitives.ConvertECAddressToUserStr(address)
-			ecAddresses = append(ecAddresses, adr)
-			ecKeys = append(ecKeys, string(we.GetName()))
-			bal, _ := ECBalance(adr)
-			ecBalances = append(ecBalances, strconv.FormatInt(bal, 10))
+			add.Address = primitives.ConvertECAddressToUserStr(address)
+			add.Key = string(we.GetName())
+			add.BalanceDecimal, err = ECBalance(add.Address)
+			if err != nil {
+				panic(err)
+			}
+			add.Balance = primitives.ConvertDecimalToFloat(uint64(add.BalanceDecimal))
+			eca = append(eca, add)
 		} else {
 			address, err := we.GetAddress()
 			if err != nil {
 				continue
 			}
-			adr = primitives.ConvertFctAddressToUserStr(address)
-			fctAddresses = append(fctAddresses, adr)
-			fctKeys = append(fctKeys, string(we.GetName()))
-			bal, _ := FctBalance(adr)
-			sbal := primitives.ConvertDecimalToPaddedString(uint64(bal))
-			fctBalances = append(fctBalances, sbal)
+			add.Address = primitives.ConvertFctAddressToUserStr(address)
+			add.Key = string(we.GetName())
+			add.BalanceDecimal, err = FctBalance(add.Address)
+			if err != nil {
+				panic(err)
+			}
+			add.Balance = primitives.ConvertDecimalToFloat(uint64(add.BalanceDecimal))
+			fa = append(fa, add)
 		}
 	}
-	var out bytes.Buffer
-	if len(fctKeys) > 0 {
-		out.WriteString("\n  Factoid Addresses\n\n")
-	}
-	fstr := fmt.Sprintf("%s%vs    %s38s %s14s\n", "%", maxlen+4, "%", "%")
-	for i, key := range fctKeys {
-		str := fmt.Sprintf(fstr, key, fctAddresses[i], fctBalances[i])
-		out.WriteString(str)
-	}
-	if len(ecKeys) > 0 {
-		out.WriteString("\n  Entry Credit Addresses\n\n")
-	}
-	for i, key := range ecKeys {
-		str := fmt.Sprintf(fstr, key, ecAddresses[i], ecBalances[i])
-		out.WriteString(str)
-	}
 
-	return out.Bytes()
+	resp := new(AddressesResponse)
+	resp.EntryCreditAddressed = eca
+	resp.FactoidAddressed = fa
+
+	return resp
 }
 
 // Specifying a fee overrides either not being connected, or the current fee.

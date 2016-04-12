@@ -80,6 +80,18 @@ type PropertiesResponse struct {
 	Message          string
 }
 
+type AddressesResponse struct {
+	EntryCreditAddressed []Address
+	FactoidAddressed     []Address
+}
+
+type Address struct {
+	Address        string
+	Key            string
+	Balance        float64
+	BalanceDecimal int64
+}
+
 /*Requests*/
 
 type GenerateAddressFromPrivateKeyRequest struct {
