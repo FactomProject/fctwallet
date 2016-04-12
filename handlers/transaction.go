@@ -590,7 +590,10 @@ func HandleV2GetFee(params interface{}) (interface{}, *primitives.JSONError) {
 }
 
 func GetAddresses() []byte {
-	addResp := GetV2Addresses()
+	addResp, err := GetV2Addresses()
+	if err != nil {
+		panic(err)
+	}
 
 	var maxlen int
 
@@ -627,10 +630,10 @@ func GetAddresses() []byte {
 	return out.Bytes()
 }
 
-func GetV2Addresses() *AddressesResponse {
+func GetV2Addresses() (*AddressesResponse, error) {
 	values, err := Wallet.GetAddresses()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	eca := make([]Address, 0, len(values))
@@ -647,7 +650,7 @@ func GetV2Addresses() *AddressesResponse {
 			add.Key = string(we.GetName())
 			add.BalanceDecimal, err = ECBalance(add.Address)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 			add.Balance = primitives.ConvertDecimalToFloat(uint64(add.BalanceDecimal))
 			eca = append(eca, add)
@@ -660,7 +663,7 @@ func GetV2Addresses() *AddressesResponse {
 			add.Key = string(we.GetName())
 			add.BalanceDecimal, err = FctBalance(add.Address)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 			add.Balance = primitives.ConvertDecimalToFloat(uint64(add.BalanceDecimal))
 			fa = append(fa, add)
@@ -797,6 +800,14 @@ func HandleGetAddresses(ctx *web.Context) {
 	}
 	ctx.ContentType("json")
 	ctx.Write(j)
+}
+
+func HandleV2GetAddresses(params interface{}) (interface{}, *primitives.JSONError) {
+	resp, err := GetV2Addresses()
+	if err != nil {
+		return nil, wsapi.NewCustomInternalError(err.Error())
+	}
+	return resp, nil
 }
 
 func HandleGetTransactionsj(ctx *web.Context) {

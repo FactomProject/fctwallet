@@ -167,15 +167,17 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 	case "properties":
 		resp, jsonError = HandleV2Properties(params)
 		break
-		/*case "factoid-get-addresses":
-			resp, jsonError = HandleV2GetAddresses(params)
-			break
-		case "factoid-get-transactions":
-			resp, jsonError = HandleV2GetTransactions(params)
-			break
-		case "factoid-get-transactionsj":
-			resp, jsonError = HandleV2GetTransactionsj(params)
-			break*/
+	case "factoid-get-addresses":
+		resp, jsonError = HandleV2GetAddresses(params)
+		break
+		/*
+			case "factoid-get-transactions":
+				resp, jsonError = HandleV2GetTransactions(params)
+				break
+			case "factoid-get-transactionsj":
+				resp, jsonError = HandleV2GetTransactionsj(params)
+				break
+		*/
 	}
 
 	if jsonError != nil {
