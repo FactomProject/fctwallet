@@ -10,9 +10,10 @@ import (
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factomd/common/constants"
 	"github.com/FactomProject/factomd/common/interfaces"
+	"github.com/FactomProject/factomd/common/primitives"
 )
 
-func ComposeChainSubmit(name string, data []byte) ([]byte, error) {
+func ComposeChainSubmit(name string, data string) (string, error) {
 	type chainsubmit struct {
 		ChainID     string
 		ChainCommit json.RawMessage
@@ -20,15 +21,15 @@ func ComposeChainSubmit(name string, data []byte) ([]byte, error) {
 	}
 
 	e := factom.NewEntry()
-	if err := e.UnmarshalJSON(data); err != nil {
-		return nil, err
+	if err := e.UnmarshalJSON([]byte(data)); err != nil {
+		return "", err
 	}
 	c := factom.NewChain(e)
 
 	sub := new(chainsubmit)
 	we, err := wallet.GetDB().FetchWalletEntryByName([]byte(name))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	pub := new([constants.ADDRESS_LENGTH]byte)
@@ -39,35 +40,35 @@ func ComposeChainSubmit(name string, data []byte) ([]byte, error) {
 	sub.ChainID = c.ChainID
 
 	if j, err := factom.ComposeChainCommit(pub, pri, c); err != nil {
-		return nil, err
+		return "", err
 	} else {
 		sub.ChainCommit = j
 	}
 
 	if j, err := factom.ComposeEntryReveal(c.FirstEntry); err != nil {
-		return nil, err
+		return "", err
 	} else {
 		sub.EntryReveal = j
 	}
 
-	return json.Marshal(sub)
+	return primitives.EncodeJSONString(sub)
 }
 
-func ComposeEntrySubmit(name string, data []byte) ([]byte, error) {
+func ComposeEntrySubmit(name string, data string) (string, error) {
 	type entrysubmit struct {
 		EntryCommit json.RawMessage
 		EntryReveal json.RawMessage
 	}
 
 	e := factom.NewEntry()
-	if err := e.UnmarshalJSON(data); err != nil {
-		return nil, err
+	if err := e.UnmarshalJSON([]byte(data)); err != nil {
+		return "", err
 	}
 
 	sub := new(entrysubmit)
 	we, err := wallet.GetDB().FetchWalletEntryByName([]byte(name))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	pub := new([constants.ADDRESS_LENGTH]byte)
@@ -76,16 +77,16 @@ func ComposeEntrySubmit(name string, data []byte) ([]byte, error) {
 	copy(pri[:], we.(interfaces.IWalletEntry).GetPrivKey(0))
 
 	if j, err := factom.ComposeEntryCommit(pub, pri, e); err != nil {
-		return nil, err
+		return "", err
 	} else {
 		sub.EntryCommit = j
 	}
 
 	if j, err := factom.ComposeEntryReveal(e); err != nil {
-		return nil, err
+		return "", err
 	} else {
 		sub.EntryReveal = j
 	}
 
-	return json.Marshal(sub)
+	return primitives.EncodeJSONString(sub)
 }

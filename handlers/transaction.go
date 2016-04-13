@@ -674,7 +674,7 @@ func GetV2Addresses() (*AddressesResponse, error) {
 	resp.EntryCreditAddressed = eca
 	resp.FactoidAddressed = fa
 
-	return resp
+	return resp, nil
 }
 
 // Specifying a fee overrides either not being connected, or the current fee.
@@ -848,5 +848,6 @@ func HandleGetTransactions(ctx *web.Context) {
 func HandleFactoidValidate(ctx *web.Context) {
 }
 
-func HandleFactoidNewSeed(ctx *web.Context) {
+func HandleV2FactoidValidate(params interface{}) (interface{}, *primitives.JSONError) {
+	return "OK", nil
 }

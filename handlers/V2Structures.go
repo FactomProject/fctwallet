@@ -47,6 +47,17 @@ type CommitResponse struct {
 	Success string
 }
 
+//Compose
+
+type ComposeRequest struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
+}
+
+type ComposeResponse struct {
+	Message string
+}
+
 //Generateaddress
 
 type GenerateAddressResponse struct {
