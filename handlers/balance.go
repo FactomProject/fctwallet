@@ -5,21 +5,21 @@
 package handlers
 
 import (
-	"fmt"
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
-	"github.com/FactomProject/web"
-	"github.com/FactomProject/factom"
-	"github.com/FactomProject/factoid/block"
-	"github.com/FactomProject/fctwallet/Wallet"
+	"fmt"
 	"github.com/FactomProject/FactomCode/common"
+	"github.com/FactomProject/factoid/block"
+	"github.com/FactomProject/factom"
+	"github.com/FactomProject/fctwallet/Wallet"
+	"github.com/FactomProject/web"
 )
 
 // Older blocks smaller indexes.  All the Factoid Directory blocks
-var DirectoryBlocks  = make([]*common.DirectoryBlock,0,100)
-var FactoidBlocks    = make([]block.IFBlock,0,100)
-var DBHead    []byte
+var DirectoryBlocks = make([]*common.DirectoryBlock, 0, 100)
+var FactoidBlocks = make([]block.IFBlock, 0, 100)
+var DBHead []byte
 var DBHeadStr string = ""
 
 // Refresh the Directory Block Head.  If it has changed, return true.
@@ -29,25 +29,25 @@ func getDBHead() bool {
 	if err != nil {
 		panic(err.Error())
 	}
-	
+
 	if db.KeyMR != DBHeadStr {
 		DBHeadStr = db.KeyMR
-		DBHead,err = hex.DecodeString(db.KeyMR)
+		DBHead, err = hex.DecodeString(db.KeyMR)
 		if err != nil {
 			panic(err.Error())
 		}
-		
+
 		return true
 	}
 	return false
 }
 
 func getAll() error {
-	dbs := make([] *common.DirectoryBlock,0,100)
+	dbs := make([]*common.DirectoryBlock, 0, 100)
 	next := DBHeadStr
-	
+
 	for {
-		blk,err := factom.GetRaw(next)
+		blk, err := factom.GetRaw(next)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -56,20 +56,20 @@ func getAll() error {
 		if err != nil {
 			panic(err.Error())
 		}
-		dbs = append(dbs,db)
-		if bytes.Equal(db.Header.PrevKeyMR.Bytes(),common.ZERO_HASH[:]) {
+		dbs = append(dbs, db)
+		if bytes.Equal(db.Header.PrevKeyMR.Bytes(), common.ZERO_HASH[:]) {
 			break
 		}
 		next = hex.EncodeToString(db.Header.PrevKeyMR.Bytes())
 	}
-	
-	for i:= len(dbs)-1;i>=0; i-- {
-		DirectoryBlocks = append(DirectoryBlocks,dbs[i])
+
+	for i := len(dbs) - 1; i >= 0; i-- {
+		DirectoryBlocks = append(DirectoryBlocks, dbs[i])
 		fb := new(block.FBlock)
-		for _,dbe := range dbs[i].DBEntries {
-			if bytes.Equal(dbe.ChainID.Bytes(),common.FACTOID_CHAINID) {
+		for _, dbe := range dbs[i].DBEntries {
+			if bytes.Equal(dbe.ChainID.Bytes(), common.FACTOID_CHAINID) {
 				hashstr := hex.EncodeToString(dbe.KeyMR.Bytes())
-				fdata,err := factom.GetRaw(hashstr)
+				fdata, err := factom.GetRaw(hashstr)
 				if err != nil {
 					panic(err.Error())
 				}
@@ -77,7 +77,7 @@ func getAll() error {
 				if err != nil {
 					panic(err.Error())
 				}
-				FactoidBlocks = append(FactoidBlocks,fb)
+				FactoidBlocks = append(FactoidBlocks, fb)
 				break
 			}
 		}
@@ -94,7 +94,7 @@ func refresh() error {
 		getAll()
 	}
 	if getDBHead() {
-			
+
 	}
 	return nil
 }
@@ -136,7 +136,7 @@ func HandleResolveAddress(ctx *web.Context, adr string) {
 	type x struct {
 		Fct, Ec string
 	}
-	
+
 	f, e, err := Wallet.NetkiResolve(adr)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)

@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	
+
 	fct "github.com/FactomProject/factoid"
 	"github.com/FactomProject/factoid/wallet"
 	"github.com/FactomProject/fctwallet/Wallet/Utility"
@@ -34,7 +34,7 @@ func FactoidNewTransaction(key string) error {
 
 	ok := Utility.IsValidKey(key)
 	if !ok {
-		return  fmt.Errorf("Invalid name for transaction")
+		return fmt.Errorf("Invalid name for transaction")
 	}
 
 	// Make sure we don't already have a transaction in process with this key
@@ -88,7 +88,6 @@ func FactoidAddFee(trans fct.ITransaction, key string, address fct.IAddress, nam
 	if !ok {
 		return 0, fmt.Errorf("Invalid name for transaction")
 	}
-	
 
 	fee, err := GetFee()
 	if err != nil {
@@ -142,7 +141,6 @@ func FactoidSubFee(trans fct.ITransaction, key string, address fct.IAddress, nam
 	if !ok {
 		return 0, fmt.Errorf("Invalid name for transaction")
 	}
-	
 
 	fee, err := GetFee()
 	if err != nil {
@@ -173,7 +171,6 @@ func FactoidAddInput(trans fct.ITransaction, key string, address fct.IAddress, a
 	if !ok {
 		return fmt.Errorf("Invalid name for transaction")
 	}
-	
 
 	// First look if this is really an update
 	for _, input := range trans.GetInputs() {
@@ -266,7 +263,7 @@ func FactoidSignTransaction(key string) error {
 
 	valid, err := factoidState.GetWallet().SignInputs(trans)
 	if !valid {
-		return fmt.Errorf("Do not have all the private keys required to sign this transaction\n"+
+		return fmt.Errorf("Do not have all the private keys required to sign this transaction\n" +
 			err.Error())
 	}
 	if err != nil {
@@ -298,8 +295,8 @@ func FactoidSubmit(jsonkey string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-    
-	err = isReasonableFee(trans) 
+
+	err = isReasonableFee(trans)
 	if err != nil {
 		return "", err
 	}
@@ -349,45 +346,45 @@ func FactoidSubmit(jsonkey string) (string, error) {
 	return r.Response, nil
 }
 
-func isReasonableFee(trans fct.ITransaction) (error) {
-                feeRate, getErr := GetFee()
-                if getErr != nil {
-                    return getErr
-                }
-                
-			    reqFee, err := trans.CalculateFee(uint64(feeRate))
-			    if err != nil {
-				    return err
-			    }
-			    
-			    sreqFee := int64(reqFee)
-                
-                tin, err := trans.TotalInputs()
-                if err != nil {
-                    return err
-                }
-                
-			    tout, err := trans.TotalOutputs()
-                if err != nil {
-                    return err
-                }
-                
-			    tec,  err := trans.TotalECs()
-                if err != nil {
-                    return err
-                }
-                
-			    cfee := int64(tin) - int64(tout) - int64(tec)
+func isReasonableFee(trans fct.ITransaction) error {
+	feeRate, getErr := GetFee()
+	if getErr != nil {
+		return getErr
+	}
 
-                if cfee >= (sreqFee*10) {
-                    return fmt.Errorf("Unbalanced transaction (fee too high). Fee should be less than 10x the required fee.")
-                }
-                
-                if cfee < sreqFee {
-                    return fmt.Errorf("Insufficient fee")
-                }
+	reqFee, err := trans.CalculateFee(uint64(feeRate))
+	if err != nil {
+		return err
+	}
 
-                return nil
+	sreqFee := int64(reqFee)
+
+	tin, err := trans.TotalInputs()
+	if err != nil {
+		return err
+	}
+
+	tout, err := trans.TotalOutputs()
+	if err != nil {
+		return err
+	}
+
+	tec, err := trans.TotalECs()
+	if err != nil {
+		return err
+	}
+
+	cfee := int64(tin) - int64(tout) - int64(tec)
+
+	if cfee >= (sreqFee * 10) {
+		return fmt.Errorf("Unbalanced transaction (fee too high). Fee should be less than 10x the required fee.")
+	}
+
+	if cfee < sreqFee {
+		return fmt.Errorf("Insufficient fee")
+	}
+
+	return nil
 }
 
 func GetFee() (int64, error) {
@@ -415,10 +412,10 @@ func GetFee() (int64, error) {
 func GetProperties() (protocol, factomd, fctwallet string, err error) {
 	type prop struct {
 		Protocol_Version  string
-		Factomd_Version	  string
+		Factomd_Version   string
 		Fctwallet_Version string
 	}
-	
+
 	str := fmt.Sprintf("http://%s:%d/v1/properties/", ipaddressFD, portNumberFD)
 	resp, err := http.Get(str)
 	if err != nil {
@@ -430,7 +427,7 @@ func GetProperties() (protocol, factomd, fctwallet string, err error) {
 		return "", "", "", err
 	}
 	resp.Body.Close()
-	
+
 	b := new(prop)
 	if err := json.Unmarshal(body, b); err != nil {
 		return "", "", "", err
@@ -468,17 +465,15 @@ func GetTransactions() ([][]byte, []fct.ITransaction, error) {
 			}
 		}
 	}
-	answer  := []fct.ITransaction{}
+	answer := []fct.ITransaction{}
 	theKeys := [][]byte{}
-	
 
-	
 	for i, _ := range values {
 		if values[i] == nil {
 			continue
 		}
 		answer = append(answer, values[i].(fct.ITransaction))
-		theKeys = append(theKeys,keys[i])
+		theKeys = append(theKeys, keys[i])
 	}
 
 	return theKeys, answer, nil

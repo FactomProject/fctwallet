@@ -46,13 +46,13 @@ func LookupAddress(adrType string, adr string) (string, error) {
 			return "", fmt.Errorf("Name %s is undefined.", adr)
 		}
 	}
-	
+
 	return adr, nil
 }
 
 func FactoidBalance(adr string) (int64, error) {
-	
-	adr, err := LookupAddress("FA",adr)
+
+	adr, err := LookupAddress("FA", adr)
 	if err != nil {
 		return 0, err
 	}
@@ -88,11 +88,11 @@ func FactoidBalance(adr string) (int64, error) {
 
 func ECBalance(adr string) (int64, error) {
 
-	adr, err := LookupAddress("EC",adr)
+	adr, err := LookupAddress("EC", adr)
 	if err != nil {
 		return 0, err
 	}
-	
+
 	str := fmt.Sprintf("http://%s:%d/v1/entry-credit-balance/%s", ipaddressFD, portNumberFD, adr)
 	resp, err := http.Get(str)
 	if err != nil {

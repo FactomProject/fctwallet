@@ -7,19 +7,19 @@ package Wallet
 import (
 	"encoding/json"
 	"fmt"
-	
+
 	fct "github.com/FactomProject/factoid"
-	"github.com/FactomProject/factom"
 	"github.com/FactomProject/factoid/wallet"
+	"github.com/FactomProject/factom"
 )
 
 func ComposeChainSubmit(name string, data []byte) ([]byte, error) {
 	type chainsubmit struct {
-		ChainID string
+		ChainID     string
 		ChainCommit json.RawMessage
 		EntryReveal json.RawMessage
 	}
-	
+
 	e := factom.NewEntry()
 	if err := e.UnmarshalJSON(data); err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func ComposeChainSubmit(name string, data []byte) ([]byte, error) {
 		copy(pri[:], we.(wallet.IWalletEntry).GetPrivKey(0))
 
 		sub.ChainID = c.ChainID
-		
+
 		if j, err := factom.ComposeChainCommit(pub, pri, c); err != nil {
 			return nil, err
 		} else {
@@ -48,11 +48,11 @@ func ComposeChainSubmit(name string, data []byte) ([]byte, error) {
 		} else {
 			sub.EntryReveal = j
 		}
-		
+
 	default:
 		return nil, fmt.Errorf("Cannot use non Entry Credit Address for Chain Commit")
 	}
-	
+
 	return json.Marshal(sub)
 }
 
@@ -61,7 +61,7 @@ func ComposeEntrySubmit(name string, data []byte) ([]byte, error) {
 		EntryCommit json.RawMessage
 		EntryReveal json.RawMessage
 	}
-	
+
 	e := factom.NewEntry()
 	if err := e.UnmarshalJSON(data); err != nil {
 		return nil, err
@@ -87,10 +87,10 @@ func ComposeEntrySubmit(name string, data []byte) ([]byte, error) {
 		} else {
 			sub.EntryReveal = j
 		}
-		
+
 	default:
 		return nil, fmt.Errorf("Cannot use non Entry Credit Address for Entry Commit")
 	}
-	
+
 	return json.Marshal(sub)
 }

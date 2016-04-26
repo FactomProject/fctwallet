@@ -3,16 +3,15 @@
 // license that can be found in the LICENSE file.
 package Utility
 
-
 import (
 	"bytes"
 	"encoding/hex"
-	"fmt"
-	"github.com/FactomProject/factoid/block"
-	fct "github.com/FactomProject/factoid"
-	"github.com/FactomProject/factom"
-	"github.com/FactomProject/FactomCode/common"
 	"encoding/json"
+	"fmt"
+	"github.com/FactomProject/FactomCode/common"
+	fct "github.com/FactomProject/factoid"
+	"github.com/FactomProject/factoid/block"
+	"github.com/FactomProject/factom"
 )
 
 /************************************************
@@ -20,39 +19,39 @@ import (
  ***********************************************/
 
 // Older blocks smaller indexes.  All the Factoid Directory blocks
-var DirectoryBlocks  = make([]*common.DirectoryBlock,0,100)
-var FactoidBlocks    = make([]block.IFBlock,0,100)
-var DBHead    []byte = common.ZERO_HASH
+var DirectoryBlocks = make([]*common.DirectoryBlock, 0, 100)
+var FactoidBlocks = make([]block.IFBlock, 0, 100)
+var DBHead []byte = common.ZERO_HASH
 var DBHeadStr string = ""
-var DBHeadLast []byte = common.ZERO_HASH	
-	
+var DBHeadLast []byte = common.ZERO_HASH
+
 // Refresh the Directory Block Head.  If it has changed, return true.
 // Otherwise return false.
 func getDBHead() bool {
 	db, err := factom.GetDBlockHead()
-	
+
 	if err != nil {
 		panic(err.Error())
 	}
-	
+
 	if db.KeyMR != DBHeadStr {
 		DBHeadStr = db.KeyMR
-		DBHead,err = hex.DecodeString(db.KeyMR)
+		DBHead, err = hex.DecodeString(db.KeyMR)
 		if err != nil {
 			panic(err.Error())
 		}
-		
+
 		return true
 	}
 	return false
 }
 
 func getAll() error {
-	dbs := make([] *common.DirectoryBlock,0,100)
+	dbs := make([]*common.DirectoryBlock, 0, 100)
 	next := DBHeadStr
-	
+
 	for {
-		blk,err := factom.GetRaw(next)
+		blk, err := factom.GetRaw(next)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -61,24 +60,24 @@ func getAll() error {
 		if err != nil {
 			panic(err.Error())
 		}
-		dbs = append(dbs,db)
-		if bytes.Equal(db.Header.PrevKeyMR.Bytes(),DBHeadLast) {
+		dbs = append(dbs, db)
+		if bytes.Equal(db.Header.PrevKeyMR.Bytes(), DBHeadLast) {
 			break
 		}
 		next = hex.EncodeToString(db.Header.PrevKeyMR.Bytes())
 	}
-	
+
 	DBHeadLast = DBHead
-		
-	for i:= len(dbs)-1;i>=0; i-- {
-		DirectoryBlocks = append(DirectoryBlocks,dbs[i])
+
+	for i := len(dbs) - 1; i >= 0; i-- {
+		DirectoryBlocks = append(DirectoryBlocks, dbs[i])
 		fb := new(block.FBlock)
 		var fcnt int
-		for _,dbe := range dbs[i].DBEntries {
-			if bytes.Equal(dbe.ChainID.Bytes(),common.FACTOID_CHAINID) {
+		for _, dbe := range dbs[i].DBEntries {
+			if bytes.Equal(dbe.ChainID.Bytes(), common.FACTOID_CHAINID) {
 				fcnt++
 				hashstr := hex.EncodeToString(dbe.KeyMR.Bytes())
-				fdata,err := factom.GetRaw(hashstr)
+				fdata, err := factom.GetRaw(hashstr)
 				if err != nil {
 					panic(err.Error())
 				}
@@ -86,7 +85,7 @@ func getAll() error {
 				if err != nil {
 					panic(err.Error())
 				}
-				FactoidBlocks = append(FactoidBlocks,fb)
+				FactoidBlocks = append(FactoidBlocks, fb)
 				break
 			}
 		}
@@ -114,32 +113,33 @@ func refresh() error {
 }
 
 func filtertransaction(trans fct.ITransaction, addresses [][]byte) bool {
-	if addresses == nil || len(addresses)==0 {
+	if addresses == nil || len(addresses) == 0 {
 		return true
 	}
 	if len(trans.GetInputs()) == 0 &&
-	   len(trans.GetOutputs())== 0 { 
-		   return false
+		len(trans.GetOutputs()) == 0 {
+		return false
 	}
 
-	if len(addresses)==1  && bytes.Equal(addresses[0],trans.GetSigHash().Bytes()) {
+	if len(addresses) == 1 && bytes.Equal(addresses[0], trans.GetSigHash().Bytes()) {
 		return true
 	}
-	
-	Search: for _,adr := range addresses {
-		
-		for _,in := range trans.GetInputs() {
-			if bytes.Equal(adr,in.GetAddress().Bytes()) {
+
+Search:
+	for _, adr := range addresses {
+
+		for _, in := range trans.GetInputs() {
+			if bytes.Equal(adr, in.GetAddress().Bytes()) {
 				continue Search
 			}
 		}
-		for _,out := range trans.GetOutputs() {
-			if bytes.Equal(adr,out.GetAddress().Bytes()) {
+		for _, out := range trans.GetOutputs() {
+			if bytes.Equal(adr, out.GetAddress().Bytes()) {
 				continue Search
 			}
 		}
-		for _,ec := range trans.GetECOutputs() {
-			if bytes.Equal(adr,ec.GetAddress().Bytes()) {
+		for _, ec := range trans.GetECOutputs() {
+			if bytes.Equal(adr, ec.GetAddress().Bytes()) {
 				continue Search
 			}
 		}
@@ -152,52 +152,52 @@ func DumpTransactionsJSON(addresses [][]byte, start int, end int) ([]byte, error
 	if err := refresh(); err != nil {
 		return nil, err
 	}
-		
+
 	if end == 0 {
-		end = 1000000000	// No end, set to big number.
+		end = 1000000000 // No end, set to big number.
 	}
 
 	var transactions []fct.ITransaction
-	
-	for i,fb := range FactoidBlocks {
+
+	for i, fb := range FactoidBlocks {
 		if fb.GetDBHeight() >= uint32(start) && fb.GetDBHeight() <= uint32(end) {
 			for _, t := range fb.GetTransactions() {
 				t.SetBlockHeight(i)
 				t.GetSigHash()
-				for _,input := range t.GetInputs() {
+				for _, input := range t.GetInputs() {
 					input.SetUserAddress(fct.ConvertFctAddressToUserStr(input.GetAddress()))
 				}
-				for _,output := range t.GetOutputs() {
+				for _, output := range t.GetOutputs() {
 					output.SetUserAddress(fct.ConvertFctAddressToUserStr(output.GetAddress()))
 				}
-				for _,ecoutput := range t.GetECOutputs() {
+				for _, ecoutput := range t.GetECOutputs() {
 					ecoutput.SetUserAddress(fct.ConvertECAddressToUserStr(ecoutput.GetAddress()))
 				}
-				prtTrans := filtertransaction(t,addresses)
+				prtTrans := filtertransaction(t, addresses)
 				if prtTrans {
 					transactions = append(transactions, t)
 				}
 			}
 		}
 	}
-	
-	ret,err := json.Marshal(transactions)
-	
-	return ret,err
+
+	ret, err := json.Marshal(transactions)
+
+	return ret, err
 }
 
-func TotalFactoids() (uint64, error){
+func TotalFactoids() (uint64, error) {
 	if err := refresh(); err != nil {
-		return 0,err
+		return 0, err
 	}
 	var total uint64
-	for _,fb := range FactoidBlocks {
-		for _,t := range fb.GetTransactions() {
-			for _,input := range t.GetInputs() {
+	for _, fb := range FactoidBlocks {
+		for _, t := range fb.GetTransactions() {
+			for _, input := range t.GetInputs() {
 				amt := input.GetAmount()
 				total -= amt
 			}
-			for _,output := range t.GetOutputs() {
+			for _, output := range t.GetOutputs() {
 				amt := output.GetAmount()
 				total += amt
 			}
@@ -206,23 +206,21 @@ func TotalFactoids() (uint64, error){
 	return total, nil
 }
 
-func TotalEntryCredits() (uint64, error){
+func TotalEntryCredits() (uint64, error) {
 	if err := refresh(); err != nil {
-		return 0,err
+		return 0, err
 	}
 	var total uint64
-	for _,fb := range FactoidBlocks {
-		for _,t := range fb.GetTransactions() {
-			for _,ecoutput := range t.GetECOutputs() {
-				amt := ecoutput.GetAmount()/fb.GetExchRate()
+	for _, fb := range FactoidBlocks {
+		for _, t := range fb.GetTransactions() {
+			for _, ecoutput := range t.GetECOutputs() {
+				amt := ecoutput.GetAmount() / fb.GetExchRate()
 				total += amt
 			}
 		}
 	}
 	return total, nil
 }
-
-
 
 func DumpTransactions(addresses [][]byte) ([]byte, error) {
 	var ret bytes.Buffer
@@ -233,33 +231,33 @@ func DumpTransactions(addresses [][]byte) ([]byte, error) {
 	firstemptyblock := 0
 	coinbasetranscnt := 0
 	skippedblk := false
-	
-	for i,fb := range FactoidBlocks {
+
+	for i, fb := range FactoidBlocks {
 		var out bytes.Buffer
-		
+
 		blkempty := true
-		out.WriteString(fmt.Sprintf("Block Height %d total transactions %d\n",i,len(fb.GetTransactions())))
+		out.WriteString(fmt.Sprintf("Block Height %d total transactions %d\n", i, len(fb.GetTransactions())))
 		for j, t := range fb.GetTransactions() {
-			
-			prtTrans := filtertransaction(t,addresses)
-			
+
+			prtTrans := filtertransaction(t, addresses)
+
 			if j != 0 {
 				usertranscnt++
 				if prtTrans {
-					out.WriteString(fmt.Sprintf("Transaction %d Block Height %d\n",usertranscnt,i))
+					out.WriteString(fmt.Sprintf("Transaction %d Block Height %d\n", usertranscnt, i))
 					blkempty = false
 				}
-			}else{
+			} else {
 				coinbasetranscnt++
 			}
 			if prtTrans {
-				if j==0 && len(t.GetOutputs()) == 0 {
+				if j == 0 && len(t.GetOutputs()) == 0 {
 					out.WriteString("\nEmpty Coinbase Transaction\n\n")
-				}else if j==0 {
+				} else if j == 0 {
 					out.WriteString("\nCoinbase Transaction\n")
-					out.WriteString(fmt.Sprintf("%s\n",t.String()))
-				}else{
-					out.WriteString(fmt.Sprintf("%s\n",t.String()))
+					out.WriteString(fmt.Sprintf("%s\n", t.String()))
+				} else {
+					out.WriteString(fmt.Sprintf("%s\n", t.String()))
 				}
 			}
 		}
@@ -272,9 +270,9 @@ func DumpTransactions(addresses [][]byte) ([]byte, error) {
 		}
 		if !blkempty && skippedblk {
 			if i-1 == firstemptyblock {
-				ret.WriteString(fmt.Sprintf("Skipped block %d\n\n",firstemptyblock))
-			}else{
-				ret.WriteString(fmt.Sprintf("Skipped blocks %d-%d\n\n",firstemptyblock,i-1))
+				ret.WriteString(fmt.Sprintf("Skipped block %d\n\n", firstemptyblock))
+			} else {
+				ret.WriteString(fmt.Sprintf("Skipped blocks %d-%d\n\n", firstemptyblock, i-1))
 			}
 			skippedblk = false
 		}
@@ -282,12 +280,12 @@ func DumpTransactions(addresses [][]byte) ([]byte, error) {
 			ret.WriteString(out.String())
 		}
 	}
-	i := len(FactoidBlocks)-1
+	i := len(FactoidBlocks) - 1
 	if skippedblk {
 		if i == firstemptyblock {
-			ret.WriteString(fmt.Sprintf("Skipped block %d\n\n",firstemptyblock))
-		}else{
-			ret.WriteString(fmt.Sprintf("Skipped blocks %d-%d\n\n",firstemptyblock,i))
+			ret.WriteString(fmt.Sprintf("Skipped block %d\n\n", firstemptyblock))
+		} else {
+			ret.WriteString(fmt.Sprintf("Skipped blocks %d-%d\n\n", firstemptyblock, i))
 		}
 	}
 	return ret.Bytes(), nil

@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/FactomProject/FactomCode/util"
 	fct "github.com/FactomProject/factoid"
 	"github.com/FactomProject/factom"
 	"github.com/FactomProject/fctwallet/handlers"
-	"github.com/FactomProject/FactomCode/util"
 	"github.com/FactomProject/web"
 )
 
@@ -198,7 +198,7 @@ func main() {
 	fmt.Println("+================+")
 
 	cfg := util.ReadConfig().Wallet
-	
+
 	factom.SetServer(fmt.Sprintf("%s:%d", cfg.FactomdAddress, cfg.FactomdPort))
 	Start()
 	for {

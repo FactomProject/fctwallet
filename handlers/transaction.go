@@ -60,7 +60,7 @@ func reportResults(ctx *web.Context, response string, success bool) {
 		ctx.WriteHeader(httpBad)
 		return
 	} else {
-        ctx.ContentType("json")
+		ctx.ContentType("json")
 		ctx.Write(p)
 	}
 }
@@ -128,16 +128,16 @@ func getParams_(ctx *web.Context, params string, ec bool) (
 			address, err = we.(wallet.IWalletEntry).GetAddress()
 			if we.(wallet.IWalletEntry).GetType() == "ec" {
 				if !ec {
-					reportResults(ctx,"Was Expecting a Factoid Address",false)
+					reportResults(ctx, "Was Expecting a Factoid Address", false)
 					ok = false
 					return
 				}
-			}else{
+			} else {
 				if ec {
-					reportResults(ctx,"Was Expecting an Entry Credit Address",false)
+					reportResults(ctx, "Was Expecting an Entry Credit Address", false)
 					ok = false
 					return
-				}	
+				}
 			}
 			if err != nil || address == nil {
 				reportResults(ctx, "Should not get an error geting a address from a Wallet Entry", false)
@@ -166,97 +166,99 @@ func getParams_(ctx *web.Context, params string, ec bool) (
  * Handler Functions
  *************************************************************************/
 
-// Returns either an unbounded list of transactions, or the list of 
+// Returns either an unbounded list of transactions, or the list of
 // transactions that involve a given address.
 //
-func HandleGetProcessedTransactions(ctx*web.Context, parms string) {
+func HandleGetProcessedTransactions(ctx *web.Context, parms string) {
 	cmd := ctx.Params["cmd"]
 	adr := ctx.Params["address"]
-	
+
 	if cmd == "all" {
 		list, err := Utility.DumpTransactions(nil)
 		if err != nil {
-			reportResults(ctx,err.Error(),false)
+			reportResults(ctx, err.Error(), false)
 			return
 		}
-		reportResults(ctx,string(list),true)
-	}else{
-		
-		adr, err := Wallet.LookupAddress("FA",adr)
+		reportResults(ctx, string(list), true)
+	} else {
+
+		adr, err := Wallet.LookupAddress("FA", adr)
 		if err != nil {
-			adr, err = Wallet.LookupAddress("EC",adr)
+			adr, err = Wallet.LookupAddress("EC", adr)
 			if err != nil {
-				reportResults(ctx,fmt.Sprintf("Could not understand address %s",adr),false)
+				reportResults(ctx, fmt.Sprintf("Could not understand address %s", adr), false)
 				return
 			}
 		}
-		badr,err := hex.DecodeString(adr)
-		
+		badr, err := hex.DecodeString(adr)
+
 		var adrs [][]byte
-		adrs = append(adrs,badr)
-		
+		adrs = append(adrs, badr)
+
 		list, err := Utility.DumpTransactions(adrs)
 		if err != nil {
-			reportResults(ctx,err.Error(),false)
+			reportResults(ctx, err.Error(), false)
 			return
 		}
-		reportResults(ctx,string(list),true)
+		reportResults(ctx, string(list), true)
 	}
 }
 
-// Returns either an unbounded list of transactions, or the list of 
+// Returns either an unbounded list of transactions, or the list of
 // transactions that involve a given address.
 //
 // Return in JSON
 //
-func HandleGetProcessedTransactionsj(ctx*web.Context, parms string) {
+func HandleGetProcessedTransactionsj(ctx *web.Context, parms string) {
 	cmd := ctx.Params["cmd"]
 	adr := ctx.Params["address"]
 	sstart := ctx.Params["start"]
 	send := ctx.Params["end"]
-	
-	if len(sstart) == 0 { sstart = "0"}
-	if len(send) == 0 { send = "0"}
-	
+
+	if len(sstart) == 0 {
+		sstart = "0"
+	}
+	if len(send) == 0 {
+		send = "0"
+	}
+
 	start, err1 := strconv.ParseInt(sstart, 10, 32)
 	end, err2 := strconv.ParseInt(send, 10, 32)
 	if err1 != nil || err2 != nil {
 		start = 0
 		end = 1000000000
 	}
-	
+
 	if cmd == "all" {
-		list, err := Utility.DumpTransactionsJSON(nil,int(start),int(end))
+		list, err := Utility.DumpTransactionsJSON(nil, int(start), int(end))
 		if err != nil {
-			reportResults(ctx,err.Error(),false)
+			reportResults(ctx, err.Error(), false)
 			return
 		}
-		reportResults(ctx,string(list),true)
-	}else{
-		
-		adr, err := Wallet.LookupAddress("FA",adr)
+		reportResults(ctx, string(list), true)
+	} else {
+
+		adr, err := Wallet.LookupAddress("FA", adr)
 		if err != nil {
-			adr, err = Wallet.LookupAddress("EC",adr)
+			adr, err = Wallet.LookupAddress("EC", adr)
 			if err != nil {
-				reportResults(ctx,fmt.Sprintf("Could not understand address %s",adr),false)
+				reportResults(ctx, fmt.Sprintf("Could not understand address %s", adr), false)
 				return
 			}
 		}
-		badr,err := hex.DecodeString(adr)
-		
+		badr, err := hex.DecodeString(adr)
+
 		var adrs [][]byte
-		adrs = append(adrs,badr)
-		
-		list, err := Utility.DumpTransactionsJSON(adrs,int(start),int(end))
+		adrs = append(adrs, badr)
+
+		list, err := Utility.DumpTransactionsJSON(adrs, int(start), int(end))
 		if err != nil {
-			reportResults(ctx,err.Error(),false)
+			reportResults(ctx, err.Error(), false)
 			return
 		}
-		reportResults(ctx,string(list),true)
+		reportResults(ctx, string(list), true)
 	}
 }
-
-
 
 // Setup:  seed --
 // Setup creates the 10 fountain Factoid Addresses, then sets address
@@ -353,19 +355,19 @@ func HandleFactoidDeleteTransaction(ctx *web.Context, key string) {
 	reportResults(ctx, "Success deleting transaction", true)
 }
 
-func HandleProperties (ctx *web.Context){
+func HandleProperties(ctx *web.Context) {
 	p, f, w, err := Wallet.GetProperties()
 	if err != nil {
-		reportResults(ctx, "Failed to retrieve properties",false)
+		reportResults(ctx, "Failed to retrieve properties", false)
 		return
 	}
-	
-	ret :=      fmt.Sprintf("Protocol Version:   %s\n", p)
-	ret = ret+ fmt.Sprintf("factomd Version:    %s\n", f)
-	ret = ret+ fmt.Sprintf("fctwallet Version:  %s\n", w)
+
+	ret := fmt.Sprintf("Protocol Version:   %s\n", p)
+	ret = ret + fmt.Sprintf("factomd Version:    %s\n", f)
+	ret = ret + fmt.Sprintf("fctwallet Version:  %s\n", w)
 
 	reportResults(ctx, ret, true)
-	
+
 }
 
 func HandleFactoidAddFee(ctx *web.Context, parms string) {
@@ -492,8 +494,7 @@ func HandleFactoidAddOutput(ctx *web.Context, parms string) {
 
 	reportResults(ctx, "Success adding output", true)
 }
-		
-		
+
 func HandleFactoidAddECOutput(ctx *web.Context, parms string) {
 	trans, key, _, address, amount, ok := getParams_(ctx, parms, true)
 	if !ok {
@@ -534,14 +535,14 @@ func GetFee(ctx *web.Context) (int64, error) {
 }
 
 func HandleGetFee(ctx *web.Context, k string) {
-	
+
 	var trans fct.ITransaction
 	var err error
-	
+
 	key := ctx.Params["key"]
-	
+
 	fmt.Println("getfee", key)
-	 
+
 	if len(key) > 0 {
 		trans, err = getTransaction(ctx, key)
 		if err != nil {
@@ -549,19 +550,19 @@ func HandleGetFee(ctx *web.Context, k string) {
 			return
 		}
 	}
-	
+
 	fee, err := Wallet.GetFee()
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
 		return
 	}
-	
+
 	if trans != nil {
 		ufee, _ := trans.CalculateFee(uint64(fee))
 		fee = int64(ufee)
 	}
-	
-	reportResults(ctx, fmt.Sprintf("%s",strings.TrimSpace(fct.ConvertDecimal(uint64(fee)))), true)
+
+	reportResults(ctx, fmt.Sprintf("%s", strings.TrimSpace(fct.ConvertDecimal(uint64(fee)))), true)
 }
 
 func GetAddresses() []byte {
@@ -628,15 +629,15 @@ func GetAddresses() []byte {
 //   key (limit printout to this key)
 //   fee (specify the transation fee)
 func GetTransactions(ctx *web.Context) ([]byte, error) {
-	connected := true 
-	
+	connected := true
+
 	var _ = connected
-	
+
 	exch, err := GetFee(ctx) // The Fee will be zero if we have no connection.
 	if err != nil {
 		connected = false
 	}
-	
+
 	keys, transactions, err := Wallet.GetTransactions()
 	if err != nil {
 		return nil, err
@@ -644,7 +645,7 @@ func GetTransactions(ctx *web.Context) ([]byte, error) {
 
 	var out bytes.Buffer
 	for i, trans := range transactions {
-		
+
 		fee, _ := trans.CalculateFee(uint64(exch))
 		cprt := ""
 		cin, err := trans.TotalInputs()
@@ -676,7 +677,7 @@ func GetTransactions(ctx *web.Context) ([]byte, error) {
 		}
 
 		out.WriteString(fmt.Sprintf("%s:  Fee Due: %s  %s\n\n%s\n",
-			strings.TrimSpace(strings.TrimRight(string(keys[i]),"\u0000")),
+			strings.TrimSpace(strings.TrimRight(string(keys[i]), "\u0000")),
 			strings.TrimSpace(fct.ConvertDecimal(fee)),
 			cprt,
 			transactions[i].String()))
@@ -711,25 +712,25 @@ func GetTransactions(ctx *web.Context) ([]byte, error) {
 //   key (limit printout to this key)
 //   fee (specify the transation fee)
 func GetTransactionsj(ctx *web.Context) (string, error) {
-	connected := true 
-	
+	connected := true
+
 	var _ = connected
-		
+
 	keys, transactions, _ := Wallet.GetTransactions()
 	type pair struct {
-		Key string
+		Key     string
 		TransID string
 	}
 	var trans []*pair
-	for i,t := range transactions {
+	for i, t := range transactions {
 		p := new(pair)
-		p.Key = strings.TrimRight(string(keys[i]),"\u0000")
+		p.Key = strings.TrimRight(string(keys[i]), "\u0000")
 		p.TransID = t.GetSigHash().String()
-		trans = append(trans,p)
+		trans = append(trans, p)
 	}
-	
+
 	return common.EncodeJSONString(trans)
-	
+
 }
 
 func HandleGetAddresses(ctx *web.Context) {
@@ -741,7 +742,7 @@ func HandleGetAddresses(ctx *web.Context) {
 		reportResults(ctx, err.Error(), false)
 		return
 	}
-    ctx.ContentType("json")
+	ctx.ContentType("json")
 	ctx.Write(j)
 }
 
@@ -762,7 +763,6 @@ func HandleGetTransactionsj(ctx *web.Context) {
 	ctx.Write(j)
 }
 
-
 func HandleGetTransactions(ctx *web.Context) {
 	b := new(Response)
 	txt, err := GetTransactions(ctx)
@@ -777,7 +777,7 @@ func HandleGetTransactions(ctx *web.Context) {
 		reportResults(ctx, err.Error(), false)
 		return
 	}
-    ctx.ContentType("json")
+	ctx.ContentType("json")
 	ctx.Write(j)
 }
 
