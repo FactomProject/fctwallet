@@ -28,9 +28,9 @@ func ECBalance(adr string) (int64, error) {
 }
 
 func HandleEntryCreditBalance(ctx *web.Context, adr string) {
-	req := primitives.NewJSON2Request(1, adr, "entry-credit-balance")
+	req := primitives.NewJSON2Request("entry-credit-balance", 1, adr)
 
-	jsonResp, jsonError := HandleV2GetRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -57,9 +57,9 @@ func HandleV2EntryCreditBalance(params interface{}) (interface{}, *primitives.JS
 }
 
 func HandleFactoidBalance(ctx *web.Context, adr string) {
-	req := primitives.NewJSON2Request(1, adr, "factoid-balance")
+	req := primitives.NewJSON2Request("factoid-balance", 1, adr)
 
-	jsonResp, jsonError := HandleV2GetRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -86,9 +86,9 @@ func HandleV2FactoidBalance(params interface{}) (interface{}, *primitives.JSONEr
 }
 
 func HandleResolveAddress(ctx *web.Context, adr string) {
-	req := primitives.NewJSON2Request(1, adr, "resolve-address")
+	req := primitives.NewJSON2Request("resolve-address", 1, adr)
 
-	jsonResp, jsonError := HandleV2GetRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return

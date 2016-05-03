@@ -1,7 +1,6 @@
 package scwallet
 
 import (
-	"github.com/FactomProject/factomd/common/constants"
 	"github.com/FactomProject/factomd/common/factoid"
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/database/databaseOverlay"
@@ -22,7 +21,7 @@ func NewSCOverlay(db interfaces.IDatabase) interfaces.ISCDatabaseOverlay {
 //Wallet Entries
 
 func (sc *SCDatabaseOverlay) FetchWalletEntryByName(addr []byte) (interfaces.IWalletEntry, error) {
-	we, err := sc.DB.Get([]byte(constants.W_NAME), addr, new(WalletEntry))
+	we, err := sc.DB.Get([]byte(W_NAME), addr, new(WalletEntry))
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +32,7 @@ func (sc *SCDatabaseOverlay) FetchWalletEntryByName(addr []byte) (interfaces.IWa
 }
 
 func (sc *SCDatabaseOverlay) FetchWalletEntryByPublicKey(addr []byte) (interfaces.IWalletEntry, error) {
-	we, err := sc.DB.Get([]byte(constants.W_ADDRESS_PUB_KEY), addr, new(WalletEntry))
+	we, err := sc.DB.Get([]byte(W_ADDRESS_PUB_KEY), addr, new(WalletEntry))
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +43,7 @@ func (sc *SCDatabaseOverlay) FetchWalletEntryByPublicKey(addr []byte) (interface
 }
 
 func (sc *SCDatabaseOverlay) FetchAllWalletEntriesByName() ([]interfaces.IWalletEntry, error) {
-	values, err := sc.DB.GetAll([]byte(constants.W_NAME), new(WalletEntry))
+	values, err := sc.DB.GetAll([]byte(W_NAME), new(WalletEntry))
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +59,7 @@ func (sc *SCDatabaseOverlay) FetchAllWalletEntriesByName() ([]interfaces.IWallet
 }
 
 func (sc *SCDatabaseOverlay) FetchAllWalletEntriesByPublicKey() ([]interfaces.IWalletEntry, error) {
-	values, err := sc.DB.GetAll([]byte(constants.W_ADDRESS_PUB_KEY), new(WalletEntry))
+	values, err := sc.DB.GetAll([]byte(W_ADDRESS_PUB_KEY), new(WalletEntry))
 	if err != nil {
 		return nil, err
 	}
@@ -76,29 +75,29 @@ func (sc *SCDatabaseOverlay) FetchAllWalletEntriesByPublicKey() ([]interfaces.IW
 }
 
 func (sc *SCDatabaseOverlay) FetchAllAddressNameKeys() ([][]byte, error) {
-	return sc.DB.ListAllKeys([]byte(constants.W_NAME))
+	return sc.DB.ListAllKeys([]byte(W_NAME))
 }
 
 func (sc *SCDatabaseOverlay) FetchAllAddressPublicKeys() ([][]byte, error) {
-	return sc.DB.ListAllKeys([]byte(constants.W_ADDRESS_PUB_KEY))
+	return sc.DB.ListAllKeys([]byte(W_ADDRESS_PUB_KEY))
 }
 
 func (sc *SCDatabaseOverlay) SaveRCDAddress(key []byte, we interfaces.IWalletEntry) error {
-	return sc.DB.Put([]byte(constants.W_RCD_ADDRESS_HASH), key, we)
+	return sc.DB.Put([]byte(W_RCD_ADDRESS_HASH), key, we)
 }
 
 func (sc *SCDatabaseOverlay) SaveAddressByPublicKey(key []byte, we interfaces.IWalletEntry) error {
-	return sc.DB.Put([]byte(constants.W_ADDRESS_PUB_KEY), key, we)
+	return sc.DB.Put([]byte(W_ADDRESS_PUB_KEY), key, we)
 }
 
 func (sc *SCDatabaseOverlay) SaveAddressByName(key []byte, we interfaces.IWalletEntry) error {
-	return sc.DB.Put([]byte(constants.W_NAME), key, we)
+	return sc.DB.Put([]byte(W_NAME), key, we)
 }
 
 //Transactions
 
 func (sc *SCDatabaseOverlay) FetchTransaction(key []byte) (interfaces.ITransaction, error) {
-	we, err := sc.DB.Get([]byte(constants.DB_BUILD_TRANS), key, new(factoid.Transaction))
+	we, err := sc.DB.Get([]byte(DB_BUILD_TRANS), key, new(factoid.Transaction))
 	if err != nil {
 		return nil, err
 	}
@@ -109,19 +108,19 @@ func (sc *SCDatabaseOverlay) FetchTransaction(key []byte) (interfaces.ITransacti
 }
 
 func (sc *SCDatabaseOverlay) SaveTransaction(key []byte, tx interfaces.ITransaction) error {
-	return sc.DB.Put([]byte(constants.DB_BUILD_TRANS), key, tx)
+	return sc.DB.Put([]byte(DB_BUILD_TRANS), key, tx)
 }
 
 func (sc *SCDatabaseOverlay) DeleteTransaction(key []byte) error {
-	return sc.DB.Delete([]byte(constants.DB_BUILD_TRANS), key)
+	return sc.DB.Delete([]byte(DB_BUILD_TRANS), key)
 }
 
 func (sc *SCDatabaseOverlay) FetchAllTransactionKeys() ([][]byte, error) {
-	return sc.DB.ListAllKeys([]byte(constants.DB_BUILD_TRANS))
+	return sc.DB.ListAllKeys([]byte(DB_BUILD_TRANS))
 }
 
 func (sc *SCDatabaseOverlay) FetchAllTransactions() ([]interfaces.ITransaction, error) {
-	values, err := sc.DB.GetAll([]byte(constants.DB_BUILD_TRANS), new(factoid.Transaction))
+	values, err := sc.DB.GetAll([]byte(DB_BUILD_TRANS), new(factoid.Transaction))
 	if err != nil {
 		return nil, err
 	}

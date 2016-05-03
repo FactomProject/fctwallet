@@ -26,9 +26,9 @@ func HandleComposeEntrySubmit(ctx *web.Context, name string) {
 	dat.Name = name
 	dat.Data = string(data)
 
-	req := primitives.NewJSON2Request(1, dat, "compose-entry-submit")
+	req := primitives.NewJSON2Request("compose-entry-submit", 1, dat)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		fmt.Println(jsonError.Error())
 		ctx.WriteHeader(httpBad)
@@ -69,9 +69,9 @@ func HandleComposeChainSubmit(ctx *web.Context, name string) {
 	dat.Name = name
 	dat.Data = string(data)
 
-	req := primitives.NewJSON2Request(1, dat, "compose-chain-submit")
+	req := primitives.NewJSON2Request("compose-chain-submit", 1, dat)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		fmt.Println(jsonError.Error())
 		ctx.WriteHeader(httpBad)

@@ -17,7 +17,7 @@ const (
 )
 
 var (
-	cfg              = util.ReadConfig("")
+	cfg              = util.ReadConfig("", "")
 	IpAddress        = cfg.Wallet.Address
 	PortNumber       = cfg.Wallet.Port
 	applicationName  = "Factom/fctwallet"
@@ -30,7 +30,7 @@ var (
 )
 
 func init() {
-	factom.SetServer(fmt.Sprintf("%v:%v", ipaddressFD, portNumberFD))
+	factom.SetFactomdServer(fmt.Sprintf("%v:%v", ipaddressFD, portNumberFD))
 }
 
 /*

@@ -171,9 +171,9 @@ func HandleFactoidSetup(ctx *web.Context, seed string) {
 // their own keys. Once a transaction is either submitted or deleted, the key
 // can be reused.
 func HandleFactoidNewTransaction(ctx *web.Context, key string) {
-	req := primitives.NewJSON2Request(1, key, "factoid-new-transaction")
+	req := primitives.NewJSON2Request("factoid-new-transaction", 1, key)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -208,9 +208,9 @@ func HandleV2FactoidNewTransaction(params interface{}) (interface{}, *primitives
 // you just need to throw one a way, and rebuild it.
 //
 func HandleFactoidDeleteTransaction(ctx *web.Context, key string) {
-	req := primitives.NewJSON2Request(1, key, "factoid-delete-transaction")
+	req := primitives.NewJSON2Request("factoid-delete-transaction", 1, key)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -239,9 +239,9 @@ func HandleV2FactoidDeleteTransaction(params interface{}) (interface{}, *primiti
 }
 
 func HandleProperties(ctx *web.Context) {
-	req := primitives.NewJSON2Request(1, nil, "properties")
+	req := primitives.NewJSON2Request("properties", 1, nil)
 
-	jsonResp, jsonError := HandleV2GetRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -275,9 +275,9 @@ func HandleFactoidAddFee(ctx *web.Context, params string) {
 		fmt.Println("Not OK")
 		return
 	}
-	req := primitives.NewJSON2Request(1, par, "factoid-add-fee")
+	req := primitives.NewJSON2Request("factoid-add-fee", 1, par)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -336,9 +336,9 @@ func HandleFactoidSubFee(ctx *web.Context, params string) {
 		fmt.Println("Not OK")
 		return
 	}
-	req := primitives.NewJSON2Request(1, par, "factoid-sub-fee")
+	req := primitives.NewJSON2Request("factoid-sub-fee", 1, par)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -394,9 +394,9 @@ func HandleFactoidAddInput(ctx *web.Context, parms string) {
 		fmt.Println("Not OK")
 		return
 	}
-	req := primitives.NewJSON2Request(1, par, "factoid-add-input")
+	req := primitives.NewJSON2Request("factoid-add-input", 1, par)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -427,9 +427,9 @@ func HandleFactoidAddOutput(ctx *web.Context, parms string) {
 		fmt.Println("Not OK")
 		return
 	}
-	req := primitives.NewJSON2Request(1, par, "factoid-add-output")
+	req := primitives.NewJSON2Request("factoid-add-output", 1, par)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -460,9 +460,9 @@ func HandleFactoidAddECOutput(ctx *web.Context, parms string) {
 		fmt.Println("Not OK")
 		return
 	}
-	req := primitives.NewJSON2Request(1, par, "factoid-add-ecoutput")
+	req := primitives.NewJSON2Request("factoid-add-ecoutput", 1, par)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -488,9 +488,9 @@ func HandleV2FactoidAddECOutput(params interface{}) (interface{}, *primitives.JS
 }
 
 func HandleFactoidSignTransaction(ctx *web.Context, key string) {
-	req := primitives.NewJSON2Request(1, key, "factoid-sign-transaction")
+	req := primitives.NewJSON2Request("factoid-sign-transaction", 1, key)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -516,9 +516,9 @@ func HandleV2FactoidSignTransaction(params interface{}) (interface{}, *primitive
 }
 
 func HandleFactoidSubmit(ctx *web.Context, jsonkey string) {
-	req := primitives.NewJSON2Request(1, jsonkey, "factoid-submit")
+	req := primitives.NewJSON2Request("factoid-submit", 1, jsonkey)
 
-	jsonResp, jsonError := HandleV2PostRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return
@@ -545,9 +545,9 @@ func HandleV2FactoidSubmit(params interface{}) (interface{}, *primitives.JSONErr
 
 func HandleGetFee(ctx *web.Context, k string) {
 	key := ctx.Params["key"]
-	req := primitives.NewJSON2Request(1, key, "factoid-get-fee")
+	req := primitives.NewJSON2Request("factoid-get-fee", 1, key)
 
-	jsonResp, jsonError := HandleV2GetRequest(req)
+	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
 		reportResults(ctx, jsonError.Message, false)
 		return

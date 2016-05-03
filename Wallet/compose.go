@@ -8,9 +8,10 @@ import (
 	"encoding/json"
 
 	"github.com/FactomProject/factom"
-	"github.com/FactomProject/factomd/common/constants"
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/common/primitives"
+
+	"github.com/FactomProject/fctwallet/scwallet"
 )
 
 func ComposeChainSubmit(name string, data string) (string, error) {
@@ -20,7 +21,7 @@ func ComposeChainSubmit(name string, data string) (string, error) {
 		EntryReveal json.RawMessage
 	}
 
-	e := factom.NewEntry()
+	e := new(factom.Entry)
 	if err := e.UnmarshalJSON([]byte(data)); err != nil {
 		return "", err
 	}
@@ -32,9 +33,9 @@ func ComposeChainSubmit(name string, data string) (string, error) {
 		return "", err
 	}
 
-	pub := new([constants.ADDRESS_LENGTH]byte)
+	pub := new([scwallet.ADDRESS_LENGTH]byte)
 	copy(pub[:], we.(interfaces.IWalletEntry).GetKey(0))
-	pri := new([constants.PRIVATE_LENGTH]byte)
+	pri := new([scwallet.PRIVATE_LENGTH]byte)
 	copy(pri[:], we.(interfaces.IWalletEntry).GetPrivKey(0))
 
 	sub.ChainID = c.ChainID
@@ -60,7 +61,7 @@ func ComposeEntrySubmit(name string, data string) (string, error) {
 		EntryReveal json.RawMessage
 	}
 
-	e := factom.NewEntry()
+	e := new(factom.Entry)
 	if err := e.UnmarshalJSON([]byte(data)); err != nil {
 		return "", err
 	}
@@ -71,9 +72,9 @@ func ComposeEntrySubmit(name string, data string) (string, error) {
 		return "", err
 	}
 
-	pub := new([constants.ADDRESS_LENGTH]byte)
+	pub := new([scwallet.ADDRESS_LENGTH]byte)
 	copy(pub[:], we.(interfaces.IWalletEntry).GetKey(0))
-	pri := new([constants.PRIVATE_LENGTH]byte)
+	pri := new([scwallet.PRIVATE_LENGTH]byte)
 	copy(pri[:], we.(interfaces.IWalletEntry).GetPrivKey(0))
 
 	if j, err := factom.ComposeEntryCommit(pub, pri, e); err != nil {

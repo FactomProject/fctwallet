@@ -14,7 +14,7 @@ var (
 
 	databasefile = "factoid_wallet_bolt.db"
 
-	cfg          = util.ReadConfig("")
+	cfg          = util.ReadConfig("", "")
 	ipaddressFD  = cfg.Wallet.Address
 	portNumberFD = cfg.Wsapi.PortNumber
 )

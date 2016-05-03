@@ -14,7 +14,6 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"github.com/FactomProject/factomd/common/constants"
 	. "github.com/FactomProject/factomd/common/factoid"
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/common/primitives"
@@ -145,17 +144,17 @@ func (w *WalletEntry) UnmarshalBinaryData(data []byte) ([]byte, error) {
 	blen, data := data[0], data[1:]
 	w.public = make([][]byte, blen, blen)
 	for i := 0; i < int(blen); i++ {
-		w.public[i] = make([]byte, constants.ADDRESS_LENGTH, constants.ADDRESS_LENGTH)
-		copy(w.public[i], data[:constants.ADDRESS_LENGTH])
-		data = data[constants.ADDRESS_LENGTH:]
+		w.public[i] = make([]byte, ADDRESS_LENGTH, ADDRESS_LENGTH)
+		copy(w.public[i], data[:ADDRESS_LENGTH])
+		data = data[ADDRESS_LENGTH:]
 	}
 
 	blen, data = data[0], data[1:]
 	w.private = make([][]byte, blen, blen)
 	for i := 0; i < int(blen); i++ {
-		w.private[i] = make([]byte, constants.ADDRESS_LENGTH, constants.ADDRESS_LENGTH)
-		copy(w.private[i], data[:constants.ADDRESS_LENGTH])
-		data = data[constants.ADDRESS_LENGTH:]
+		w.private[i] = make([]byte, ADDRESS_LENGTH, ADDRESS_LENGTH)
+		copy(w.private[i], data[:ADDRESS_LENGTH])
+		data = data[ADDRESS_LENGTH:]
 	}
 	return data, nil
 }
@@ -195,7 +194,7 @@ func (w WalletEntry) MarshalBinary() ([]byte, error) {
 }
 
 func (w WalletEntry) CustomMarshalText() (text []byte, err error) {
-	var out bytes.Buffer
+	var out primitives.Buffer
 
 	out.WriteString("name:  ")
 	out.Write(w.name)
@@ -234,13 +233,13 @@ func (w WalletEntry) GetRCD() interfaces.IRCD {
 }
 
 func (w *WalletEntry) AddKey(public, private []byte) {
-	if len(public) != constants.ADDRESS_LENGTH || (len(private) != constants.ADDRESS_LENGTH &&
-		len(private) != constants.PRIVATE_LENGTH) {
+	if len(public) != ADDRESS_LENGTH || (len(private) != ADDRESS_LENGTH &&
+		len(private) != PRIVATE_LENGTH) {
 		panic(fmt.Sprintf("Bad Keys presented to AddKey.  Should not happen."+
 			"\n  public: %x\n  private: %x", public, private))
 	}
-	pu := make([]byte, constants.ADDRESS_LENGTH, constants.ADDRESS_LENGTH)
-	pr := make([]byte, constants.PRIVATE_LENGTH, constants.PRIVATE_LENGTH)
+	pu := make([]byte, ADDRESS_LENGTH, ADDRESS_LENGTH)
+	pr := make([]byte, PRIVATE_LENGTH, PRIVATE_LENGTH)
 	copy(pu, public)
 	copy(pr[:32], private)
 	copy(pr[32:], public)

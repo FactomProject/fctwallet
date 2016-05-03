@@ -16,7 +16,6 @@ import (
 	"github.com/FactomProject/ed25519"
 	"os"
 
-	"github.com/FactomProject/factomd/common/constants"
 	. "github.com/FactomProject/factomd/common/factoid"
 	"github.com/FactomProject/factomd/common/interfaces"
 	"github.com/FactomProject/factomd/common/primitives"
@@ -99,9 +98,9 @@ func (w *SCWallet) SignInputs(trans interfaces.ITransaction) (bool, error) {
 // SignCommit will sign the []byte with the Entry Credit Key and return the
 // slice with the signature and pubkey appended.
 func (w *SCWallet) SignCommit(we interfaces.IWalletEntry, data []byte) []byte {
-	pub := new([constants.ADDRESS_LENGTH]byte)
+	pub := new([ADDRESS_LENGTH]byte)
 	copy(pub[:], we.GetKey(0))
-	pri := new([constants.PRIVATE_LENGTH]byte)
+	pri := new([PRIVATE_LENGTH]byte)
 	copy(pri[:], we.GetPrivKey(0))
 	sig := ed25519.Sign(pri, data)
 	r := append(data, pub[:]...)
@@ -251,15 +250,15 @@ func (w *SCWallet) NewSeed(data []byte) {
 	w.RootSeed = seedhash
 	b := new(bytestore.ByteStore)
 	b.SetBytes(w.RootSeed)
-	err := w.db.Put([]byte(constants.W_SEEDS), constants.CURRENT_SEED[:], b)
+	err := w.db.Put([]byte(W_SEEDS), CURRENT_SEED[:], b)
 	if err != nil {
 		panic(err)
 	}
-	err = w.db.Put([]byte(constants.W_SEEDS), w.RootSeed[:32], b)
+	err = w.db.Put([]byte(W_SEEDS), w.RootSeed[:32], b)
 	if err != nil {
 		panic(err)
 	}
-	err = w.db.Put([]byte(constants.W_SEED_HEADS), w.RootSeed[:32], b)
+	err = w.db.Put([]byte(W_SEED_HEADS), w.RootSeed[:32], b)
 	if err != nil {
 		panic(err)
 	}
@@ -270,22 +269,22 @@ func (w *SCWallet) SetSeed(seed []byte) {
 	w.RootSeed = seed
 	b := new(bytestore.ByteStore)
 	b.SetBytes(w.RootSeed)
-	err := w.db.Put([]byte(constants.W_SEEDS), constants.CURRENT_SEED[:], b)
+	err := w.db.Put([]byte(W_SEEDS), CURRENT_SEED[:], b)
 	if err != nil {
 		panic(err)
 	}
-	err = w.db.Put([]byte(constants.W_SEEDS), w.RootSeed[:32], b)
+	err = w.db.Put([]byte(W_SEEDS), w.RootSeed[:32], b)
 	if err != nil {
 		panic(err)
 	}
-	err = w.db.Put([]byte(constants.W_SEED_HEADS), w.RootSeed[:32], b)
+	err = w.db.Put([]byte(W_SEED_HEADS), w.RootSeed[:32], b)
 	if err != nil {
 		panic(err)
 	}
 }
 
 func (w *SCWallet) GetSeed() []byte {
-	iroot, err := w.db.Get([]byte(constants.W_SEEDS), constants.CURRENT_SEED[:], new(bytestore.ByteStore))
+	iroot, err := w.db.Get([]byte(W_SEEDS), CURRENT_SEED[:], new(bytestore.ByteStore))
 	if err != nil {
 		panic(err)
 	}
@@ -301,7 +300,7 @@ func (w *SCWallet) GetSeed() []byte {
 
 	b := new(bytestore.ByteStore)
 	b.SetBytes(w.NextSeed)
-	err = w.db.Put([]byte(constants.W_SEED_HEADS), w.RootSeed[:32], b)
+	err = w.db.Put([]byte(W_SEED_HEADS), w.RootSeed[:32], b)
 	if err != nil {
 		panic(err)
 	}
@@ -339,7 +338,7 @@ func (w *SCWallet) CreateTransaction(time uint64) interfaces.ITransaction {
 
 func (w *SCWallet) getWalletEntry(bucket []byte, address interfaces.IAddress) (interfaces.IWalletEntry, interfaces.IAddress, error) {
 
-	v, err := w.db.Get([]byte(constants.W_RCD_ADDRESS_HASH), address.Bytes(), new(WalletEntry))
+	v, err := w.db.Get([]byte(W_RCD_ADDRESS_HASH), address.Bytes(), new(WalletEntry))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -359,7 +358,7 @@ func (w *SCWallet) getWalletEntry(bucket []byte, address interfaces.IAddress) (i
 
 // Returns the Address hash (what we use for inputs) given the public key
 func (w *SCWallet) GetAddressHash(address interfaces.IAddress) (interfaces.IAddress, error) {
-	_, adr, err := w.getWalletEntry([]byte(constants.W_RCD_ADDRESS_HASH), address)
+	_, adr, err := w.getWalletEntry([]byte(W_RCD_ADDRESS_HASH), address)
 	if err != nil {
 		return nil, err
 	}
@@ -368,7 +367,7 @@ func (w *SCWallet) GetAddressHash(address interfaces.IAddress) (interfaces.IAddr
 
 func (w *SCWallet) AddInput(trans interfaces.ITransaction, address interfaces.IAddress, amount uint64) error {
 	// Check if this is an address we know.
-	we, adr, err := w.getWalletEntry([]byte(constants.W_RCD_ADDRESS_HASH), address)
+	we, adr, err := w.getWalletEntry([]byte(W_RCD_ADDRESS_HASH), address)
 	// If it isn't, we assume the user knows what they are doing.
 	if we == nil || err != nil {
 		rcd := NewRCD_1(address.Bytes())
@@ -388,7 +387,7 @@ func (w *SCWallet) AddInput(trans interfaces.ITransaction, address interfaces.IA
 
 func (w *SCWallet) UpdateInput(trans interfaces.ITransaction, index int, address interfaces.IAddress, amount uint64) error {
 
-	we, adr, err := w.getWalletEntry([]byte(constants.W_RCD_ADDRESS_HASH), address)
+	we, adr, err := w.getWalletEntry([]byte(W_RCD_ADDRESS_HASH), address)
 	if err != nil {
 		return err
 	}
@@ -408,7 +407,7 @@ func (w *SCWallet) UpdateInput(trans interfaces.ITransaction, index int, address
 
 func (w *SCWallet) AddOutput(trans interfaces.ITransaction, address interfaces.IAddress, amount uint64) error {
 
-	_, adr, err := w.getWalletEntry([]byte(constants.W_RCD_ADDRESS_HASH), address)
+	_, adr, err := w.getWalletEntry([]byte(W_RCD_ADDRESS_HASH), address)
 	if err != nil {
 		adr = address
 	}
@@ -420,7 +419,7 @@ func (w *SCWallet) AddOutput(trans interfaces.ITransaction, address interfaces.I
 
 func (w *SCWallet) AddECOutput(trans interfaces.ITransaction, address interfaces.IAddress, amount uint64) error {
 
-	_, adr, err := w.getWalletEntry([]byte(constants.W_RCD_ADDRESS_HASH), address)
+	_, adr, err := w.getWalletEntry([]byte(W_RCD_ADDRESS_HASH), address)
 	if err != nil {
 		adr = address
 	}
