@@ -33,13 +33,7 @@ func HandleV2(ctx *web.Context, post bool) {
 		return
 	}
 
-	var jsonResp *primitives.JSON2Response
-	var jsonError *primitives.JSONError
-	if post == true {
-		jsonResp, jsonError = HandleV2PostRequest(j)
-	} else {
-		jsonResp, jsonError = HandleV2GetRequest(j)
-	}
+	jsonResp, jsonError := HandleV2Request(j)
 
 	if jsonError != nil {
 		wsapi.HandleV2Error(ctx, j, jsonError)
@@ -49,11 +43,12 @@ func HandleV2(ctx *web.Context, post bool) {
 	ctx.Write([]byte(jsonResp.String()))
 }
 
-func HandleV2PostRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, *primitives.JSONError) {
+func HandleV2Request(j *primitives.JSON2Request) (*primitives.JSON2Response, *primitives.JSONError) {
 	params := j.Params
 	var resp interface{}
 	var jsonError *primitives.JSONError
 	switch j.Method {
+	//Former POSTs
 	case "compose-chain-submit":
 		resp, jsonError = HandleV2ComposeChainSubmit(params)
 		break
@@ -100,24 +95,8 @@ func HandleV2PostRequest(j *primitives.JSON2Request) (*primitives.JSON2Response,
 			case "factoid-get-processed-transactionsj/":
 				resp, jsonError = HandleV2GetProcessedTransactionsj(params)
 				break*/
-	}
-	if jsonError != nil {
-		return nil, jsonError
-	}
 
-	jsonResp := primitives.NewJSON2Response()
-	jsonResp.ID = j.ID
-	jsonResp.Result = resp
-
-	return jsonResp, nil
-}
-
-func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, *primitives.JSONError) {
-	params := j.Params
-	var resp interface{}
-	var jsonError *primitives.JSONError
-
-	switch j.Method {
+		//Former GETs
 	case "factoid-balance":
 		resp, jsonError = HandleV2FactoidBalance(params)
 		break
@@ -172,7 +151,6 @@ func HandleV2GetRequest(j *primitives.JSON2Request) (*primitives.JSON2Response, 
 				break
 		*/
 	}
-
 	if jsonError != nil {
 		return nil, jsonError
 	}
