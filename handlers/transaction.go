@@ -36,7 +36,6 @@ func HandleGetProcessedTransactions(ctx *web.Context, parms string) {
 		}
 		reportResults(ctx, string(list), true)
 	} else {
-
 		adr, err := Wallet.LookupAddress("FA", adr)
 		if err != nil {
 			adr, err = Wallet.LookupAddress("EC", adr)

@@ -12,15 +12,7 @@ import (
 	"github.com/FactomProject/web"
 )
 
-func HandleV2Get(ctx *web.Context) {
-	HandleV2(ctx, false)
-}
-
-func HandleV2Post(ctx *web.Context) {
-	HandleV2(ctx, true)
-}
-
-func HandleV2(ctx *web.Context, post bool) {
+func HandleV2(ctx *web.Context) {
 	body, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
 		wsapi.HandleV2Error(ctx, nil, wsapi.NewInvalidRequestError())
