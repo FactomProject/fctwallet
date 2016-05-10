@@ -184,6 +184,9 @@ func Start() {
 	// localhost:8089/v1/factoid-get-addresses/
 	server.Post("/v1/factoid-get-processed-transactionsj/(.*)", handlers.HandleGetProcessedTransactionsj)
 
+	server.Post("/v2", HandleV2)
+	server.Get("/v2", HandleV2)
+
 	go server.Run(fmt.Sprintf("%s:%d", handlers.IpAddress, handlers.PortNumber))
 }
 
