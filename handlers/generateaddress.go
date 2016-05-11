@@ -21,10 +21,11 @@ func HandleFactoidGenerateAddress(ctx *web.Context, name string) {
 }
 
 func HandleV2FactoidGenerateAddress(params interface{}) (interface{}, *primitives.JSONError) {
-	name, ok := params.(string)
+	req, ok := params.(*NameRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	name := req.Name
 
 	if Utility.IsValidKey(name) == false {
 		return nil, NewInvalidNameError()
@@ -50,10 +51,11 @@ func HandleFactoidGenerateECAddress(ctx *web.Context, name string) {
 }
 
 func HandleV2FactoidGenerateECAddress(params interface{}) (interface{}, *primitives.JSONError) {
-	name, ok := params.(string)
+	req, ok := params.(*NameRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	name := req.Name
 
 	if Utility.IsValidKey(name) == false {
 		return nil, NewInvalidNameError()
@@ -304,10 +306,11 @@ func HandleVerifyAddressType(ctx *web.Context, params string) {
 }
 
 func HandleV2VerifyAddressType(params interface{}) (interface{}, *primitives.JSONError) {
-	address, ok := params.(string)
+	req, ok := params.(*AddressRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	address := req.Address
 
 	resp, pass := Wallet.VerifyAddressType(address)
 

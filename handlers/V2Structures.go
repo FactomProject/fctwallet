@@ -21,6 +21,18 @@ func NewInvalidNameError() *primitives.JSONError {
 	return primitives.NewJSONError(-32602, "Invalid params", "Name provided is not valid")
 }
 
+type NameRequest struct {
+	Name string
+}
+
+type AddressRequest struct {
+	Address string
+}
+
+type KeyRequest struct {
+	Key string
+}
+
 //Balance
 
 type EntryCreditBalanceResponse struct {

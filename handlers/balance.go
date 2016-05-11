@@ -41,10 +41,11 @@ func HandleEntryCreditBalance(ctx *web.Context, adr string) {
 }
 
 func HandleV2EntryCreditBalance(params interface{}) (interface{}, *primitives.JSONError) {
-	adr, ok := params.(string)
+	req, ok := params.(*AddressRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	adr := req.Address
 
 	v, err := ECBalance(adr)
 	if err != nil {
@@ -70,10 +71,11 @@ func HandleFactoidBalance(ctx *web.Context, adr string) {
 }
 
 func HandleV2FactoidBalance(params interface{}) (interface{}, *primitives.JSONError) {
-	adr, ok := params.(string)
+	req, ok := params.(*AddressRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	adr := req.Address
 
 	v, err := FctBalance(adr)
 	if err != nil {
@@ -111,10 +113,11 @@ func HandleResolveAddress(ctx *web.Context, adr string) {
 }
 
 func HandleV2ResolveAddress(params interface{}) (interface{}, *primitives.JSONError) {
-	adr, ok := params.(string)
+	req, ok := params.(*AddressRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	adr := req.Address
 
 	fAddress, ecAddress, err := Wallet.NetkiResolve(adr)
 	if err != nil {

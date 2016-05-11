@@ -182,10 +182,11 @@ func HandleFactoidNewTransaction(ctx *web.Context, key string) {
 }
 
 func HandleV2FactoidNewTransaction(params interface{}) (interface{}, *primitives.JSONError) {
-	key, ok := params.(string)
+	request, ok := params.(*KeyRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	key := request.Key
 
 	msg, valid := ValidateKey(key)
 	if !valid {
@@ -219,10 +220,11 @@ func HandleFactoidDeleteTransaction(ctx *web.Context, key string) {
 }
 
 func HandleV2FactoidDeleteTransaction(params interface{}) (interface{}, *primitives.JSONError) {
-	key, ok := params.(string)
+	request, ok := params.(*KeyRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	key := request.Key
 
 	// Make sure we have a key
 	if len(key) == 0 {
@@ -499,10 +501,11 @@ func HandleFactoidSignTransaction(ctx *web.Context, key string) {
 }
 
 func HandleV2FactoidSignTransaction(params interface{}) (interface{}, *primitives.JSONError) {
-	key, ok := params.(string)
+	request, ok := params.(*KeyRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	key := request.Key
 
 	err := Wallet.FactoidSignTransaction(key)
 	if err != nil {
@@ -527,12 +530,13 @@ func HandleFactoidSubmit(ctx *web.Context, jsonkey string) {
 }
 
 func HandleV2FactoidSubmit(params interface{}) (interface{}, *primitives.JSONError) {
-	jsonkey, ok := params.(string)
+	request, ok := params.(*KeyRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	key := request.Key
 
-	_, err := Wallet.FactoidSubmit(jsonkey)
+	_, err := Wallet.FactoidSubmit(key)
 	if err != nil {
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
@@ -556,10 +560,11 @@ func HandleGetFee(ctx *web.Context, k string) {
 }
 
 func HandleV2GetFee(params interface{}) (interface{}, *primitives.JSONError) {
-	key, ok := params.(string)
+	request, ok := params.(*KeyRequest)
 	if ok == false {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	key := request.Key
 
 	var trans interfaces.ITransaction
 	var err error
