@@ -675,8 +675,8 @@ func GetV2Addresses() (*AddressesResponse, error) {
 	}
 
 	resp := new(AddressesResponse)
-	resp.EntryCreditAddressed = eca
-	resp.FactoidAddressed = fa
+	resp.EntryCreditAddresses = eca
+	resp.FactoidAddresses = fa
 
 	return resp, nil
 }

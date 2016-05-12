@@ -22,30 +22,30 @@ func NewInvalidNameError() *primitives.JSONError {
 }
 
 type NameRequest struct {
-	Name string
+	Name string `json:"name"`
 }
 
 type AddressRequest struct {
-	Address string
+	Address string `json:"address"`
 }
 
 type KeyRequest struct {
-	Key string
+	Key string `json:"key"`
 }
 
 //Balance
 
 type EntryCreditBalanceResponse struct {
-	Balance int64
+	Balance int64 `json:"balance"`
 }
 
 type FactoidBalanceResponse struct {
-	Balance int64
+	Balance int64 `json:"balance"`
 }
 
 type ResolveAddressResponse struct {
-	FactoidAddress     string
-	EntryCreditAddress string
+	FactoidAddress     string `json:"factoidaddress"`
+	EntryCreditAddress string `json:"entrycreditaddress"`
 }
 
 //Commit
@@ -56,7 +56,7 @@ type CommitRequest struct {
 }
 
 type CommitResponse struct {
-	Success string
+	Success string `json:"success"`
 }
 
 //Compose
@@ -67,52 +67,52 @@ type ComposeRequest struct {
 }
 
 type ComposeResponse struct {
-	Message string
+	Message string `json:"message"`
 }
 
 //Generateaddress
 
 type GenerateAddressResponse struct {
-	Address string
+	Address string `json:"address"`
 }
 
 type VerifyAddressTypeResponse struct {
-	Type  string
-	Valid bool
+	Type  string `json:"type"`
+	Valid bool   `json:"valid"`
 }
 
 //Transaction
 
 type FactoidFeeResponse struct {
-	Message  string
-	FeeDelta int64
+	Message  string `json:"message"`
+	FeeDelta int64  `json:"feedelta"`
 }
 
 type GetFeeResponse struct {
-	Fee int64
+	Fee int64 `json:"fee"`
 }
 
 type MessageResponse struct {
-	Message string
+	Message string `json:"message"`
 }
 
 type PropertiesResponse struct {
-	ProtocolVersion  string
-	FactomdVersion   string
-	FCTWalletVersion string
-	Message          string
+	ProtocolVersion  string `json:"protocolversion"`
+	FactomdVersion   string `json:"factomdversion"`
+	FCTWalletVersion string `json:"fctwalletversion"`
+	Message          string `json:"message"`
 }
 
 type AddressesResponse struct {
-	EntryCreditAddressed []Address
-	FactoidAddressed     []Address
+	EntryCreditAddresses []Address `json:"entrycreditaddresses"`
+	FactoidAddresses     []Address `json:"factoidaddresses"`
 }
 
 type Address struct {
-	Address        string
-	Key            string
-	Balance        float64
-	BalanceDecimal int64
+	Address        string  `json:"address"`
+	Key            string  `json:"key"`
+	Balance        float64 `json:"balance"`
+	BalanceDecimal int64   `json:"balancedecimal"`
 }
 
 /*Requests*/
@@ -124,11 +124,11 @@ type GenerateAddressFromPrivateKeyRequest struct {
 }
 
 type RequestParams struct {
-	Key         string `json:"key,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Amount      int64  `json:"amount,omitempty"`
-	Address     interfaces.IAddress
-	Transaction interfaces.ITransaction
+	Key         string                  `json:"key,omitempty"`
+	Name        string                  `json:"name,omitempty"`
+	Amount      int64                   `json:"amount,omitempty"`
+	Address     interfaces.IAddress     `json:"address"`
+	Transaction interfaces.ITransaction `json:"transaction"`
 }
 
 // &key=<key>&name=<name or address>&amount=<amount>
