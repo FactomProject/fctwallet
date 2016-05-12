@@ -601,31 +601,31 @@ func GetAddresses() []byte {
 
 	var maxlen int
 
-	for i := range addResp.EntryCreditAddressed {
-		if len(addResp.EntryCreditAddressed[i].Key) > maxlen {
-			maxlen = len(addResp.EntryCreditAddressed[i].Key)
+	for i := range addResp.EntryCreditAddresses {
+		if len(addResp.EntryCreditAddresses[i].Key) > maxlen {
+			maxlen = len(addResp.EntryCreditAddresses[i].Key)
 		}
 	}
-	for i := range addResp.FactoidAddressed {
-		if len(addResp.FactoidAddressed[i].Key) > maxlen {
-			maxlen = len(addResp.FactoidAddressed[i].Key)
+	for i := range addResp.FactoidAddresses {
+		if len(addResp.FactoidAddresses[i].Key) > maxlen {
+			maxlen = len(addResp.FactoidAddresses[i].Key)
 		}
 	}
 
 	var out bytes.Buffer
-	if len(addResp.FactoidAddressed) > 0 {
+	if len(addResp.FactoidAddresses) > 0 {
 		out.WriteString("\n  Factoid Addresses\n\n")
 	}
 	fstr := fmt.Sprintf("%s%vs    %s38s %s14s\n", "%", maxlen+4, "%", "%")
-	for _, fAdd := range addResp.FactoidAddressed {
+	for _, fAdd := range addResp.FactoidAddresses {
 		bal := primitives.ConvertDecimalToString(uint64(fAdd.BalanceDecimal))
 		str := fmt.Sprintf(fstr, fAdd.Key, fAdd.Address, bal)
 		out.WriteString(str)
 	}
-	if len(addResp.EntryCreditAddressed) > 0 {
+	if len(addResp.EntryCreditAddresses) > 0 {
 		out.WriteString("\n  Entry Credit Addresses\n\n")
 	}
-	for _, ecAdd := range addResp.EntryCreditAddressed {
+	for _, ecAdd := range addResp.EntryCreditAddresses {
 		bal := primitives.ConvertDecimalToString(uint64(ecAdd.BalanceDecimal))
 		str := fmt.Sprintf(fstr, ecAdd.Key, ecAdd.Address, bal)
 		out.WriteString(str)
