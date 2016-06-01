@@ -21,8 +21,9 @@ func HandleFactoidGenerateAddress(ctx *web.Context, name string) {
 }
 
 func HandleV2FactoidGenerateAddress(params interface{}) (interface{}, *primitives.JSONError) {
-	req, ok := params.(*NameRequest)
-	if ok == false {
+	req := new(NameRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 	name := req.Name
@@ -51,8 +52,9 @@ func HandleFactoidGenerateECAddress(ctx *web.Context, name string) {
 }
 
 func HandleV2FactoidGenerateECAddress(params interface{}) (interface{}, *primitives.JSONError) {
-	req, ok := params.(*NameRequest)
-	if ok == false {
+	req := new(NameRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 	name := req.Name
@@ -93,8 +95,9 @@ func HandleFactoidGenerateAddressFromPrivateKey(ctx *web.Context, params string)
 }
 
 func HandleV2FactoidGenerateAddressFromPrivateKey(params interface{}) (interface{}, *primitives.JSONError) {
-	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
-	if ok == false {
+	priv := new(GenerateAddressFromPrivateKeyRequest)
+	err := wsapi.MapToObject(params, priv)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 
@@ -138,8 +141,9 @@ func HandleFactoidGenerateECAddressFromPrivateKey(ctx *web.Context, params strin
 }
 
 func HandleV2FactoidGenerateECAddressFromPrivateKey(params interface{}) (interface{}, *primitives.JSONError) {
-	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
-	if ok == false {
+	priv := new(GenerateAddressFromPrivateKeyRequest)
+	err := wsapi.MapToObject(params, priv)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 
@@ -187,8 +191,9 @@ func HandleFactoidGenerateAddressFromHumanReadablePrivateKey(ctx *web.Context, p
 }
 
 func HandleV2FactoidGenerateAddressFromHumanReadablePrivateKey(params interface{}) (interface{}, *primitives.JSONError) {
-	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
-	if ok == false {
+	priv := new(GenerateAddressFromPrivateKeyRequest)
+	err := wsapi.MapToObject(params, priv)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 
@@ -226,8 +231,9 @@ func HandleFactoidGenerateECAddressFromHumanReadablePrivateKey(ctx *web.Context,
 }
 
 func HandleV2FactoidGenerateECAddressFromHumanReadablePrivateKey(params interface{}) (interface{}, *primitives.JSONError) {
-	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
-	if ok == false {
+	priv := new(GenerateAddressFromPrivateKeyRequest)
+	err := wsapi.MapToObject(params, priv)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 
@@ -269,8 +275,9 @@ func HandleFactoidGenerateAddressFromMnemonic(ctx *web.Context, params string) {
 }
 
 func HandleV2FactoidGenerateAddressFromMnemonic(params interface{}) (interface{}, *primitives.JSONError) {
-	priv, ok := params.(*GenerateAddressFromPrivateKeyRequest)
-	if ok == false {
+	priv := new(GenerateAddressFromPrivateKeyRequest)
+	err := wsapi.MapToObject(params, priv)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 
@@ -306,10 +313,12 @@ func HandleVerifyAddressType(ctx *web.Context, params string) {
 }
 
 func HandleV2VerifyAddressType(params interface{}) (interface{}, *primitives.JSONError) {
-	req, ok := params.(*AddressRequest)
-	if ok == false {
+	req := new(AddressRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+
 	address := req.Address
 
 	resp, pass := Wallet.VerifyAddressType(address)

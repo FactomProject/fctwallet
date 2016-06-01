@@ -41,8 +41,9 @@ func HandleEntryCreditBalance(ctx *web.Context, adr string) {
 }
 
 func HandleV2EntryCreditBalance(params interface{}) (interface{}, *primitives.JSONError) {
-	req, ok := params.(*AddressRequest)
-	if ok == false {
+	req := new(AddressRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 	adr := req.Address
@@ -71,8 +72,9 @@ func HandleFactoidBalance(ctx *web.Context, adr string) {
 }
 
 func HandleV2FactoidBalance(params interface{}) (interface{}, *primitives.JSONError) {
-	req, ok := params.(*AddressRequest)
-	if ok == false {
+	req := new(AddressRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 	adr := req.Address
@@ -113,8 +115,9 @@ func HandleResolveAddress(ctx *web.Context, adr string) {
 }
 
 func HandleV2ResolveAddress(params interface{}) (interface{}, *primitives.JSONError) {
-	req, ok := params.(*AddressRequest)
-	if ok == false {
+	req := new(AddressRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 	adr := req.Address

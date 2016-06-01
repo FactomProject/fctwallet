@@ -182,8 +182,9 @@ func HandleFactoidNewTransaction(ctx *web.Context, key string) {
 }
 
 func HandleV2FactoidNewTransaction(params interface{}) (interface{}, *primitives.JSONError) {
-	request, ok := params.(*KeyRequest)
-	if ok == false {
+	request := new(KeyRequest)
+	err := wsapi.MapToObject(params, request)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 	key := request.Key
@@ -193,7 +194,7 @@ func HandleV2FactoidNewTransaction(params interface{}) (interface{}, *primitives
 		return nil, wsapi.NewCustomInvalidParamsError(msg)
 	}
 
-	err := Wallet.FactoidNewTransaction(key)
+	err = Wallet.FactoidNewTransaction(key)
 	if err != nil {
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
@@ -220,8 +221,9 @@ func HandleFactoidDeleteTransaction(ctx *web.Context, key string) {
 }
 
 func HandleV2FactoidDeleteTransaction(params interface{}) (interface{}, *primitives.JSONError) {
-	request, ok := params.(*KeyRequest)
-	if ok == false {
+	request := new(KeyRequest)
+	err := wsapi.MapToObject(params, request)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 	key := request.Key
@@ -230,7 +232,7 @@ func HandleV2FactoidDeleteTransaction(params interface{}) (interface{}, *primiti
 	if len(key) == 0 {
 		return nil, wsapi.NewInvalidParamsError()
 	}
-	err := Wallet.FactoidDeleteTransaction(key)
+	err = Wallet.FactoidDeleteTransaction(key)
 	if err != nil {
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
@@ -501,13 +503,14 @@ func HandleFactoidSignTransaction(ctx *web.Context, key string) {
 }
 
 func HandleV2FactoidSignTransaction(params interface{}) (interface{}, *primitives.JSONError) {
-	request, ok := params.(*KeyRequest)
-	if ok == false {
+	request := new(KeyRequest)
+	err := wsapi.MapToObject(params, request)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 	key := request.Key
 
-	err := Wallet.FactoidSignTransaction(key)
+	err = Wallet.FactoidSignTransaction(key)
 	if err != nil {
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
@@ -530,13 +533,14 @@ func HandleFactoidSubmit(ctx *web.Context, jsonkey string) {
 }
 
 func HandleV2FactoidSubmit(params interface{}) (interface{}, *primitives.JSONError) {
-	request, ok := params.(*KeyRequest)
-	if ok == false {
+	request := new(KeyRequest)
+	err := wsapi.MapToObject(params, request)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 	key := request.Key
 
-	_, err := Wallet.FactoidSubmit(key)
+	_, err = Wallet.FactoidSubmit(key)
 	if err != nil {
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
@@ -560,14 +564,14 @@ func HandleGetFee(ctx *web.Context, k string) {
 }
 
 func HandleV2GetFee(params interface{}) (interface{}, *primitives.JSONError) {
-	request, ok := params.(*KeyRequest)
-	if ok == false {
+	request := new(KeyRequest)
+	err := wsapi.MapToObject(params, request)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 	key := request.Key
 
 	var trans interfaces.ITransaction
-	var err error
 
 	fmt.Println("getfee", key)
 

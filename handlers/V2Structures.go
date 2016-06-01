@@ -155,8 +155,9 @@ func V1toV2Params(ctx *web.Context) *RequestParams {
 // &key=<key>&name=<name or address>&amount=<amount>
 // If no amount is specified, a zero is returned.
 func GetV2Params(params interface{}) (*RequestParams, *primitives.JSONError) {
-	req, ok := params.(*RequestParams)
-	if ok == false {
+	req := new(RequestParams)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 

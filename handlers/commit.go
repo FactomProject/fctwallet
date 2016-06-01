@@ -35,12 +35,13 @@ func HandleCommitChain(ctx *web.Context, name string) {
 }
 
 func HandleV2CommitChain(params interface{}) (interface{}, *primitives.JSONError) {
-	req, ok := params.(*CommitRequest)
-	if ok == false {
+	req := new(CommitRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 
-	err := Wallet.CommitChain(req.Name, []byte(req.Data))
+	err = Wallet.CommitChain(req.Name, []byte(req.Data))
 	if err != nil {
 		fmt.Println(err)
 		return nil, wsapi.NewCustomInternalError(err.Error())
@@ -71,12 +72,13 @@ func HandleCommitEntry(ctx *web.Context, name string) {
 }
 
 func HandleV2CommitEntry(params interface{}) (interface{}, *primitives.JSONError) {
-	req, ok := params.(*CommitRequest)
-	if ok == false {
+	req := new(CommitRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 
-	err := Wallet.CommitEntry(req.Name, []byte(req.Data))
+	err = Wallet.CommitEntry(req.Name, []byte(req.Data))
 	if err != nil {
 		fmt.Println(err)
 		return nil, wsapi.NewCustomInternalError(err.Error())

@@ -42,8 +42,9 @@ func HandleComposeEntrySubmit(ctx *web.Context, name string) {
 }
 
 func HandleV2ComposeEntrySubmit(params interface{}) (interface{}, *primitives.JSONError) {
-	data, ok := params.(*ComposeRequest)
-	if ok == false {
+	data := new(ComposeRequest)
+	err := wsapi.MapToObject(params, data)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 
@@ -85,8 +86,9 @@ func HandleComposeChainSubmit(ctx *web.Context, name string) {
 }
 
 func HandleV2ComposeChainSubmit(params interface{}) (interface{}, *primitives.JSONError) {
-	data, ok := params.(*ComposeRequest)
-	if ok == false {
+	data := new(ComposeRequest)
+	err := wsapi.MapToObject(params, data)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
 
