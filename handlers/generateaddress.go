@@ -16,6 +16,7 @@ func HandleFactoidGenerateAddress(ctx *web.Context, name string) {
 	answer, err := HandleV2FactoidGenerateAddress(name)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
+		return
 	}
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
@@ -47,6 +48,7 @@ func HandleFactoidGenerateECAddress(ctx *web.Context, name string) {
 	answer, err := HandleV2FactoidGenerateECAddress(name)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
+		return
 	}
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
@@ -89,6 +91,7 @@ func HandleFactoidGenerateAddressFromPrivateKey(ctx *web.Context, params string)
 	answer, err := HandleV2FactoidGenerateAddressFromPrivateKey(req)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
+		return
 	}
 
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
@@ -135,6 +138,7 @@ func HandleFactoidGenerateECAddressFromPrivateKey(ctx *web.Context, params strin
 	answer, err := HandleV2FactoidGenerateECAddressFromPrivateKey(req)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
+		return
 	}
 
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
@@ -185,6 +189,7 @@ func HandleFactoidGenerateAddressFromHumanReadablePrivateKey(ctx *web.Context, p
 	answer, err := HandleV2FactoidGenerateAddressFromHumanReadablePrivateKey(req)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
+		return
 	}
 
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
@@ -225,8 +230,8 @@ func HandleFactoidGenerateECAddressFromHumanReadablePrivateKey(ctx *web.Context,
 	answer, err := HandleV2FactoidGenerateECAddressFromHumanReadablePrivateKey(req)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
+		return
 	}
-
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
 }
 
@@ -269,6 +274,7 @@ func HandleFactoidGenerateAddressFromMnemonic(ctx *web.Context, params string) {
 	answer, err := HandleV2FactoidGenerateAddressFromMnemonic(req)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
+		return
 	}
 
 	reportResults(ctx, answer.(*GenerateAddressResponse).Address, true)
@@ -307,6 +313,7 @@ func HandleVerifyAddressType(ctx *web.Context, params string) {
 	answer, err := HandleV2VerifyAddressType(address)
 	if err != nil {
 		reportResults(ctx, err.Error(), false)
+		return
 	}
 
 	reportResults(ctx, answer.(*VerifyAddressTypeResponse).Type, answer.(*VerifyAddressTypeResponse).Valid)
