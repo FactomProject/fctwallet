@@ -520,8 +520,8 @@ func HandleV2FactoidSignTransaction(params interface{}) (interface{}, *primitive
 	return resp, nil
 }
 
-func HandleFactoidSubmit(ctx *web.Context, jsonkey string) {
-	req := primitives.NewJSON2Request("factoid-submit", 1, jsonkey)
+func HandleFactoidSubmit(ctx *web.Context, key string) {
+	req := primitives.NewJSON2Request("factoid-submit", 1, KeyRequest{Key: key})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -552,7 +552,7 @@ func HandleV2FactoidSubmit(params interface{}) (interface{}, *primitives.JSONErr
 
 func HandleGetFee(ctx *web.Context, k string) {
 	key := ctx.Params["key"]
-	req := primitives.NewJSON2Request("factoid-get-fee", 1, key)
+	req := primitives.NewJSON2Request("factoid-get-fee", 1, KeyRequest{Key: key})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
