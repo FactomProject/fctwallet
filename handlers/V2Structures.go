@@ -175,6 +175,9 @@ func GetV2Params(params interface{}) (*RequestParams, *primitives.JSONError) {
 	if err != nil {
 		return nil, wsapi.NewCustomInternalError("Failure to locate the transaction")
 	}
+	if trans == nil {
+		return nil, wsapi.NewCustomInternalError("Transaction not found")
+	}
 	req.Transaction = trans
 
 	// Get the input/output/ec address.  Which could be a name.  First look and see if it is
