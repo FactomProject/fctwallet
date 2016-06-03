@@ -170,7 +170,7 @@ func HandleFactoidSetup(ctx *web.Context, seed string) {
 // their own keys. Once a transaction is either submitted or deleted, the key
 // can be reused.
 func HandleFactoidNewTransaction(ctx *web.Context, key string) {
-	req := primitives.NewJSON2Request("factoid-new-transaction", 1, key)
+	req := primitives.NewJSON2Request("factoid-new-transaction", 1, KeyRequest{Key: key})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -209,7 +209,7 @@ func HandleV2FactoidNewTransaction(params interface{}) (interface{}, *primitives
 // you just need to throw one a way, and rebuild it.
 //
 func HandleFactoidDeleteTransaction(ctx *web.Context, key string) {
-	req := primitives.NewJSON2Request("factoid-delete-transaction", 1, key)
+	req := primitives.NewJSON2Request("factoid-delete-transaction", 1, KeyRequest{Key: key})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -491,7 +491,7 @@ func HandleV2FactoidAddECOutput(params interface{}) (interface{}, *primitives.JS
 }
 
 func HandleFactoidSignTransaction(ctx *web.Context, key string) {
-	req := primitives.NewJSON2Request("factoid-sign-transaction", 1, key)
+	req := primitives.NewJSON2Request("factoid-sign-transaction", 1, KeyRequest{Key: key})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
