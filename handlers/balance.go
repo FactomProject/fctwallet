@@ -28,7 +28,7 @@ func ECBalance(adr string) (int64, error) {
 }
 
 func HandleEntryCreditBalance(ctx *web.Context, adr string) {
-	req := primitives.NewJSON2Request("entry-credit-balance", 1, adr)
+	req := primitives.NewJSON2Request("entry-credit-balance", 1, AddressRequest{Address: adr})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -41,10 +41,12 @@ func HandleEntryCreditBalance(ctx *web.Context, adr string) {
 }
 
 func HandleV2EntryCreditBalance(params interface{}) (interface{}, *primitives.JSONError) {
-	adr, ok := params.(string)
-	if ok == false {
+	req := new(AddressRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	adr := req.Address
 
 	v, err := ECBalance(adr)
 	if err != nil {
@@ -57,7 +59,7 @@ func HandleV2EntryCreditBalance(params interface{}) (interface{}, *primitives.JS
 }
 
 func HandleFactoidBalance(ctx *web.Context, adr string) {
-	req := primitives.NewJSON2Request("factoid-balance", 1, adr)
+	req := primitives.NewJSON2Request("factoid-balance", 1, AddressRequest{Address: adr})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -70,10 +72,12 @@ func HandleFactoidBalance(ctx *web.Context, adr string) {
 }
 
 func HandleV2FactoidBalance(params interface{}) (interface{}, *primitives.JSONError) {
-	adr, ok := params.(string)
-	if ok == false {
+	req := new(AddressRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	adr := req.Address
 
 	v, err := FctBalance(adr)
 	if err != nil {
@@ -86,7 +90,7 @@ func HandleV2FactoidBalance(params interface{}) (interface{}, *primitives.JSONEr
 }
 
 func HandleResolveAddress(ctx *web.Context, adr string) {
-	req := primitives.NewJSON2Request("resolve-address", 1, adr)
+	req := primitives.NewJSON2Request("resolve-address", 1, AddressRequest{Address: adr})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -111,10 +115,12 @@ func HandleResolveAddress(ctx *web.Context, adr string) {
 }
 
 func HandleV2ResolveAddress(params interface{}) (interface{}, *primitives.JSONError) {
-	adr, ok := params.(string)
-	if ok == false {
+	req := new(AddressRequest)
+	err := wsapi.MapToObject(params, req)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	adr := req.Address
 
 	fAddress, ecAddress, err := Wallet.NetkiResolve(adr)
 	if err != nil {

@@ -170,7 +170,7 @@ func HandleFactoidSetup(ctx *web.Context, seed string) {
 // their own keys. Once a transaction is either submitted or deleted, the key
 // can be reused.
 func HandleFactoidNewTransaction(ctx *web.Context, key string) {
-	req := primitives.NewJSON2Request("factoid-new-transaction", 1, key)
+	req := primitives.NewJSON2Request("factoid-new-transaction", 1, KeyRequest{Key: key})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -182,17 +182,19 @@ func HandleFactoidNewTransaction(ctx *web.Context, key string) {
 }
 
 func HandleV2FactoidNewTransaction(params interface{}) (interface{}, *primitives.JSONError) {
-	key, ok := params.(string)
-	if ok == false {
+	request := new(KeyRequest)
+	err := wsapi.MapToObject(params, request)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	key := request.Key
 
 	msg, valid := ValidateKey(key)
 	if !valid {
 		return nil, wsapi.NewCustomInvalidParamsError(msg)
 	}
 
-	err := Wallet.FactoidNewTransaction(key)
+	err = Wallet.FactoidNewTransaction(key)
 	if err != nil {
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
@@ -207,7 +209,7 @@ func HandleV2FactoidNewTransaction(params interface{}) (interface{}, *primitives
 // you just need to throw one a way, and rebuild it.
 //
 func HandleFactoidDeleteTransaction(ctx *web.Context, key string) {
-	req := primitives.NewJSON2Request("factoid-delete-transaction", 1, key)
+	req := primitives.NewJSON2Request("factoid-delete-transaction", 1, KeyRequest{Key: key})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -219,16 +221,18 @@ func HandleFactoidDeleteTransaction(ctx *web.Context, key string) {
 }
 
 func HandleV2FactoidDeleteTransaction(params interface{}) (interface{}, *primitives.JSONError) {
-	key, ok := params.(string)
-	if ok == false {
+	request := new(KeyRequest)
+	err := wsapi.MapToObject(params, request)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	key := request.Key
 
 	// Make sure we have a key
 	if len(key) == 0 {
 		return nil, wsapi.NewInvalidParamsError()
 	}
-	err := Wallet.FactoidDeleteTransaction(key)
+	err = Wallet.FactoidDeleteTransaction(key)
 	if err != nil {
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
@@ -487,7 +491,7 @@ func HandleV2FactoidAddECOutput(params interface{}) (interface{}, *primitives.JS
 }
 
 func HandleFactoidSignTransaction(ctx *web.Context, key string) {
-	req := primitives.NewJSON2Request("factoid-sign-transaction", 1, key)
+	req := primitives.NewJSON2Request("factoid-sign-transaction", 1, KeyRequest{Key: key})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -499,12 +503,14 @@ func HandleFactoidSignTransaction(ctx *web.Context, key string) {
 }
 
 func HandleV2FactoidSignTransaction(params interface{}) (interface{}, *primitives.JSONError) {
-	key, ok := params.(string)
-	if ok == false {
+	request := new(KeyRequest)
+	err := wsapi.MapToObject(params, request)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	key := request.Key
 
-	err := Wallet.FactoidSignTransaction(key)
+	err = Wallet.FactoidSignTransaction(key)
 	if err != nil {
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
@@ -514,8 +520,8 @@ func HandleV2FactoidSignTransaction(params interface{}) (interface{}, *primitive
 	return resp, nil
 }
 
-func HandleFactoidSubmit(ctx *web.Context, jsonkey string) {
-	req := primitives.NewJSON2Request("factoid-submit", 1, jsonkey)
+func HandleFactoidSubmit(ctx *web.Context, key string) {
+	req := primitives.NewJSON2Request("factoid-submit", 1, KeyRequest{Key: key})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -527,12 +533,14 @@ func HandleFactoidSubmit(ctx *web.Context, jsonkey string) {
 }
 
 func HandleV2FactoidSubmit(params interface{}) (interface{}, *primitives.JSONError) {
-	jsonkey, ok := params.(string)
-	if ok == false {
+	request := new(KeyRequest)
+	err := wsapi.MapToObject(params, request)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	key := request.Key
 
-	_, err := Wallet.FactoidSubmit(jsonkey)
+	_, err = Wallet.FactoidSubmit(key)
 	if err != nil {
 		return nil, wsapi.NewCustomInternalError(err.Error())
 	}
@@ -544,7 +552,7 @@ func HandleV2FactoidSubmit(params interface{}) (interface{}, *primitives.JSONErr
 
 func HandleGetFee(ctx *web.Context, k string) {
 	key := ctx.Params["key"]
-	req := primitives.NewJSON2Request("factoid-get-fee", 1, key)
+	req := primitives.NewJSON2Request("factoid-get-fee", 1, KeyRequest{Key: key})
 
 	jsonResp, jsonError := HandleV2Request(req)
 	if jsonError != nil {
@@ -556,13 +564,14 @@ func HandleGetFee(ctx *web.Context, k string) {
 }
 
 func HandleV2GetFee(params interface{}) (interface{}, *primitives.JSONError) {
-	key, ok := params.(string)
-	if ok == false {
+	request := new(KeyRequest)
+	err := wsapi.MapToObject(params, request)
+	if err != nil {
 		return nil, wsapi.NewInvalidParamsError()
 	}
+	key := request.Key
 
 	var trans interfaces.ITransaction
-	var err error
 
 	fmt.Println("getfee", key)
 
@@ -596,31 +605,31 @@ func GetAddresses() []byte {
 
 	var maxlen int
 
-	for i := range addResp.EntryCreditAddressed {
-		if len(addResp.EntryCreditAddressed[i].Key) > maxlen {
-			maxlen = len(addResp.EntryCreditAddressed[i].Key)
+	for i := range addResp.EntryCreditAddresses {
+		if len(addResp.EntryCreditAddresses[i].Key) > maxlen {
+			maxlen = len(addResp.EntryCreditAddresses[i].Key)
 		}
 	}
-	for i := range addResp.FactoidAddressed {
-		if len(addResp.FactoidAddressed[i].Key) > maxlen {
-			maxlen = len(addResp.FactoidAddressed[i].Key)
+	for i := range addResp.FactoidAddresses {
+		if len(addResp.FactoidAddresses[i].Key) > maxlen {
+			maxlen = len(addResp.FactoidAddresses[i].Key)
 		}
 	}
 
 	var out bytes.Buffer
-	if len(addResp.FactoidAddressed) > 0 {
+	if len(addResp.FactoidAddresses) > 0 {
 		out.WriteString("\n  Factoid Addresses\n\n")
 	}
 	fstr := fmt.Sprintf("%s%vs    %s38s %s14s\n", "%", maxlen+4, "%", "%")
-	for _, fAdd := range addResp.FactoidAddressed {
+	for _, fAdd := range addResp.FactoidAddresses {
 		bal := primitives.ConvertDecimalToString(uint64(fAdd.BalanceDecimal))
 		str := fmt.Sprintf(fstr, fAdd.Key, fAdd.Address, bal)
 		out.WriteString(str)
 	}
-	if len(addResp.EntryCreditAddressed) > 0 {
+	if len(addResp.EntryCreditAddresses) > 0 {
 		out.WriteString("\n  Entry Credit Addresses\n\n")
 	}
-	for _, ecAdd := range addResp.EntryCreditAddressed {
+	for _, ecAdd := range addResp.EntryCreditAddresses {
 		bal := primitives.ConvertDecimalToString(uint64(ecAdd.BalanceDecimal))
 		str := fmt.Sprintf(fstr, ecAdd.Key, ecAdd.Address, bal)
 		out.WriteString(str)
@@ -670,8 +679,8 @@ func GetV2Addresses() (*AddressesResponse, error) {
 	}
 
 	resp := new(AddressesResponse)
-	resp.EntryCreditAddressed = eca
-	resp.FactoidAddressed = fa
+	resp.EntryCreditAddresses = eca
+	resp.FactoidAddresses = fa
 
 	return resp, nil
 }
