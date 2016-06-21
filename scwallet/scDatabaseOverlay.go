@@ -43,7 +43,7 @@ func (sc *SCDatabaseOverlay) FetchWalletEntryByPublicKey(addr []byte) (interface
 }
 
 func (sc *SCDatabaseOverlay) FetchAllWalletEntriesByName() ([]interfaces.IWalletEntry, error) {
-	values, err := sc.DB.GetAll([]byte(W_NAME), new(WalletEntry))
+	values, _, err := sc.DB.GetAll([]byte(W_NAME), new(WalletEntry))
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (sc *SCDatabaseOverlay) FetchAllWalletEntriesByName() ([]interfaces.IWallet
 }
 
 func (sc *SCDatabaseOverlay) FetchAllWalletEntriesByPublicKey() ([]interfaces.IWalletEntry, error) {
-	values, err := sc.DB.GetAll([]byte(W_ADDRESS_PUB_KEY), new(WalletEntry))
+	values, _, err := sc.DB.GetAll([]byte(W_ADDRESS_PUB_KEY), new(WalletEntry))
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (sc *SCDatabaseOverlay) FetchAllTransactionKeys() ([][]byte, error) {
 }
 
 func (sc *SCDatabaseOverlay) FetchAllTransactions() ([]interfaces.ITransaction, error) {
-	values, err := sc.DB.GetAll([]byte(DB_BUILD_TRANS), new(factoid.Transaction))
+	values, _, err := sc.DB.GetAll([]byte(DB_BUILD_TRANS), new(factoid.Transaction))
 	if err != nil {
 		return nil, err
 	}
