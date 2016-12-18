@@ -1,0 +1,14 @@
+package: github.com/FactomProject/fctwallet
+import:
+- package: github.com/FactomProject/FactomCode
+  subpackages:
+  - common
+  - util
+- package: github.com/FactomProject/factoid
+  subpackages:
+  - block
+  - state/stateinit
+  - wallet
+- package: github.com/FactomProject/factom
+- package: github.com/FactomProject/netki-go-partner-client
+- package: github.com/FactomProject/web
